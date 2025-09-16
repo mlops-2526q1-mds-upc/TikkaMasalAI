@@ -189,3 +189,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#Ingnore private ssh key
+ssh-key.pub
+ssh-key
