@@ -11,7 +11,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     
 ]
-dependencies = [uv add pandas numpy,
+dependencies = [
     "numpy>=2.2.6",
     "pandas>=2.3.2",
     "pip",
@@ -33,4 +33,11 @@ extend-select = ["I"]  # Add import sorting
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
 force-sort-within-sections = true
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "pylint>=3.3.8",
+    "pytest>=8.4.2",
+]
 
