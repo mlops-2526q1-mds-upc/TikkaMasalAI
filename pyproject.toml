@@ -1,0 +1,43 @@
+[project]
+name = "src"
+version = "0.0.1"
+description = "MLOPS project FIB"
+authors = [
+  { name = "Team Tikka MasalAI" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+dependencies = [
+    "numpy>=2.2.6",
+    "pandas>=2.3.2",
+    "pip",
+    "pytest",
+    "python-dotenv",
+    "ruff",
+]
+requires-python = "~=3.10.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["src"]
+include = ["pyproject.toml", "src/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+force-sort-within-sections = true
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "pylint>=3.3.8",
+    "pytest>=8.4.2",
+]
+
