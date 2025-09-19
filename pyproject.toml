@@ -12,6 +12,7 @@ classifiers = [
     
 ]
 dependencies = [
+    "huggingface-hub>=0.35.0",
     "numpy>=2.2.6",
     "pandas>=2.3.2",
     "pip",
