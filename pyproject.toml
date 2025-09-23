@@ -13,7 +13,8 @@ classifiers = [
 ]
 dependencies = [
     "dagshub>=0.6.3",
-    "dvc>=3.63.0",
+    "dvc==3.63.0",
+    "ruamel-yaml-clib==0.2.8",
     "dvc-s3>=3.2.2",
     "huggingface-hub>=0.35.0",
     "matplotlib>=3.10.6",
@@ -24,11 +25,15 @@ dependencies = [
     "pytest",
     "python-dotenv",
     "ruff",
-    "torch>=2.8.0",
-    "torchvision>=0.23.0",
+    "torch==2.2.2",
+    "torchvision==0.17.2",
     "tqdm>=4.67.1",
 ]
 requires-python = "~=3.10.0"
+
+[tool.uv]
+required-environments = ["sys_platform == 'darwin' and platform_machine == 'x86_64'"]
+
 
 
 [tool.ruff]
