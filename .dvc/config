@@ -1,0 +1,6 @@
+[core]
+    remote = origin
+['remote "origin"']
+    url = s3://TikkaMasalAI
+    endpointurl = https://dagshub.com/api/v1/repo-buckets/s3/HubertWojcik10
+    region = us-east-1
