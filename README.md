@@ -4,7 +4,49 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-MLOPS project FIB
+An MLOps project for food classification using computer vision techniques.
+
+## 🤖 Models
+
+### Model Evaluation
+
+Evaluate the available models by running the evaluation script:
+
+```bash
+uv run src/eval/eval.py
+```
+
+This command evaluates three distinct models using MLflow tracking:
+
+#### 1. **Food-101-93M** (Benchmark Model)
+- **Source**: [HuggingFace Model](https://huggingface.co/prithivMLmods/Food-101-93M)
+- **Performance**: ~90% accuracy on Food-101 dataset
+- **Purpose**: Pre-trained benchmark model and potential deployment candidate
+
+#### 2. **ResNet-18** (Base Model)
+- **Source**: [Microsoft ResNet-18](https://huggingface.co/microsoft/resnet-18)
+- **Training**: Pre-trained on ImageNet-1k dataset
+- **Purpose**: Base model for fine-tuning on Food-101 dataset
+
+#### 3. **VGG-16** (Alternative Base Model)
+- **Source**: [PyTorch VGG-16](https://docs.pytorch.org/vision/main/models/generated/torchvision.models.vgg16.html)
+- **Training**: Pre-trained on ImageNet-1k dataset
+- **Purpose**: Alternative base model for Food-101 fine-tuning
+
+#### Viewing Results
+
+Launch the MLflow UI to inspect evaluation results:
+
+```bash
+uv run mlflow ui
+```
+
+Then navigate to the displayed URL (typically [http://127.0.0.1:5000](http://127.0.0.1:5000)) to view the interactive dashboard.
+
+### Adding New Models
+- To add new models you can create a new class with the name of the model under `src/models`.
+- To make existing scripts and code work with the model make sure that it inherits from [this abstract base model class](src/models/food_classification_model.py), requiring the model class to have a classify function that takes in an image as bytes and returns an integer indicating the id of the label.
+- Examples can be found in the `src/models` directory.
 
 ## Project Organization
 
