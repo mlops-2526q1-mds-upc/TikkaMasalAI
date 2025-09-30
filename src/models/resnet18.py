@@ -27,6 +27,8 @@ class Resnet18(FoodClassificationModel):
         with torch.no_grad():
             logits = self.model(**inputs).logits
 
-        # model predicts one of the 1000 ImageNet classes
+        # model predicts one of the 101 Food-101 classes (if fine-tuned for Food-101).
+        # If using the default microsoft/resnet-18 weights, this will predict one
+        # of the 1000 ImageNet classes, not Food-101.
         predicted_label = logits.argmax(-1).item()
         return predicted_label

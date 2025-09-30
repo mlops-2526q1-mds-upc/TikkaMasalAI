@@ -111,7 +111,7 @@ class Food101Evaluator:
         return exact_matches / len(predictions)
 
     def evaluate_model(
-        self, samples: List[Tuple[bytes, int, str]], verbose: bool = True
+        self, samples: List[Tuple[bytes, int]], verbose: bool = True
     ) -> Dict[str, Any]:
         """
         Evaluate the model on the provided samples.
@@ -207,6 +207,7 @@ class Food101Evaluator:
         Log evaluation artifacts to MLflow.
 
         Args:
+            results: The results from the evaluation.
 
         """
         examples_data = []
