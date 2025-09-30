@@ -12,9 +12,13 @@ from datetime import datetime
 import pandas as pd
 import glob
 import random
+import dagshub
 
 from src.models.food_classification_model import FoodClassificationModel
 from src.labels import LABELS, index_to_label
+
+dagshub.init(repo_owner="HubertWojcik10", repo_name="TikkaMasalAI", mlflow=True)
+mlflow.autolog()
 
 
 class Food101Evaluator:

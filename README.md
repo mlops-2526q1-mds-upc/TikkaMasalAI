@@ -16,7 +16,7 @@ Evaluate the available models by running the evaluation script:
 uv run src/eval/eval.py
 ```
 
-This command evaluates three distinct models using MLflow tracking:
+This command evaluates three distinct models using MLflow tracking. You can view the experiment results on [DagsHub](https://dagshub.com/HubertWojcik10/TikkaMasalAI/experiments):
 
 #### 1. **Food-101-93M** (Benchmark Model)
 - **Source**: [HuggingFace Model](https://huggingface.co/prithivMLmods/Food-101-93M)
