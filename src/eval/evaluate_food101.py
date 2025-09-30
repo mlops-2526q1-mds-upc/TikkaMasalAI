@@ -30,6 +30,7 @@ class Food101Evaluator:
         experiment_name: str = "food101_evaluation",
         sample_limit: int = 50,
         random_seed: int = 42,
+        run_name: str = None,
     ):
         """
         Initialize the Food101 evaluator.
@@ -39,12 +40,14 @@ class Food101Evaluator:
             experiment_name: Name of the MLflow experiment
             sample_limit: Maximum number of samples to evaluate
             random_seed: Random seed for reproducible sampling
+            run_name: Custom name for the MLflow run (optional)
         """
         self.DATASET_NAME = "Food101"
         self.experiment_name = experiment_name
         self.sample_limit = sample_limit
         self.model = model
         self.random_seed = random_seed
+        self.custom_run_name = run_name
         self.model_name = self.model.__class__.__name__
         self.data_dir = (
             Path(__file__).parent.parent.parent / "data" / "raw" / "food101" / "data"
@@ -259,7 +262,20 @@ class Food101Evaluator:
 
         mlflow.set_experiment(self.experiment_name)
 
-        with mlflow.start_run():
+        # Create descriptive run name
+        if self.custom_run_name:
+            run_name = self.custom_run_name
+        else:
+            timestamp = datetime.now().strftime("%m%d_%H%M")
+            run_name = f"{self.model_name}_Food101_n{self.sample_limit}_seed{self.random_seed}_{timestamp}"
+
+        with mlflow.start_run(run_name=run_name):
+            # Add useful tags for filtering and organization
+            mlflow.set_tag("model_type", self.model_name)
+            mlflow.set_tag("dataset", self.DATASET_NAME)
+            mlflow.set_tag("sample_size", str(self.sample_limit))
+            mlflow.set_tag("evaluation_type", "validation")
+
             mlflow.log_param("model_name", self.model_name)
             mlflow.log_param("model_class", self.model.__class__.__name__)
             mlflow.log_param("dataset", self.DATASET_NAME)

@@ -17,9 +17,12 @@ def evaluate_food101(
     experiment_name: str = "food101_evaluation",
     sample_limit: int = 50,
     random_seed: int = 42,
+    run_name: str = None,
 ):
     """Main evaluation function."""
-    evaluator = Food101Evaluator(model, experiment_name, sample_limit, random_seed)
+    evaluator = Food101Evaluator(
+        model, experiment_name, sample_limit, random_seed, run_name
+    )
     evaluator.run_evaluation()
 
 
@@ -35,7 +38,8 @@ def main():
     print("\n1. Evaluating PrithivMlFood101 on Food101...")
     prithiv_model = PrithivMlFood101()
     evaluate_food101(
-        experiment_name="prithivml_food101_evaluation",
+        experiment_name="Food101_Model_Comparison",
+        run_name="PrithivML_Baseline_50samples",
         sample_limit=50,  # Small sample for demonstration
         model=prithiv_model,
     )
@@ -43,7 +47,8 @@ def main():
     print("\n2. Evaluating ResNet-18 on Food101 ...")
     resnet18_food_model = Resnet18()
     evaluate_food101(
-        experiment_name="resnet18_food101_evaluation",
+        experiment_name="Food101_Model_Comparison",
+        run_name="ResNet18_Transfer_50samples",
         sample_limit=50,  # Small sample for demonstration
         model=resnet18_food_model,
     )
@@ -51,7 +56,8 @@ def main():
     print("\n3. Evaluating VGG16 on Food101 ...")
     vgg16_food_model = VGG16()
     evaluate_food101(
-        experiment_name="vgg16_food101_evaluation",
+        experiment_name="Food101_Model_Comparison",
+        run_name="VGG16_Transfer_50samples",
         sample_limit=50,  # Small sample for demonstration
         model=vgg16_food_model,
     )
