@@ -1,5 +1,9 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "src"
+name = "tikka-masalai"
 version = "0.0.1"
 description = "MLOPS project FIB"
 authors = [
@@ -9,17 +13,21 @@ authors = [
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    
 ]
 dependencies = [
     "dagshub>=0.6.3",
+    "datasets>=4.1.1",
     "dvc>=3.63.0",
     "dvc-s3>=3.2.2",
     "huggingface-hub>=0.35.0",
+    "ipykernel>=6.30.1",
+    "ipywidgets>=8.1.7",
     "matplotlib>=3.10.6",
+    "mlflow>=3.4.0",
     "numpy>=2.2.6",
     "pandas>=2.3.2",
-    "pip",
+    "pillow>=11.3.0",
+    "polars>=1.0.0",
     "pyarrow>=21.0.0",
     "pytest",
     "python-dotenv",
@@ -27,8 +35,13 @@ dependencies = [
     "torch>=2.8.0",
     "torchvision>=0.23.0",
     "tqdm>=4.67.1",
+    "transformers>=4.56.2",
 ]
-requires-python = "~=3.10.0"
+requires-python = ">=3.10"
+
+# This makes src/ discoverable as a package
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 
 [tool.ruff]
