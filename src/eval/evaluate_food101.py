@@ -226,7 +226,7 @@ class Food101Evaluator:
 
         examples_text = "\n".join(examples_data)
         examples_file = f"{self.DATASET_NAME.lower()}_evaluation_examples.txt"
-        with open(examples_file, "w") as f:
+        with open(examples_file, "w", encoding="utf-8", newline="") as f:
             f.write(examples_text)
         mlflow.log_artifact(examples_file)
 
@@ -246,7 +246,7 @@ class Food101Evaluator:
         """
 
         summary_file = f"{self.DATASET_NAME.lower()}_evaluation_summary.txt"
-        with open(summary_file, "w") as f:
+        with open(summary_file, "w", encoding="utf-8", newline="") as f:
             f.write(summary)
         mlflow.log_artifact(summary_file)
 
