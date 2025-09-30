@@ -48,6 +48,23 @@ Then navigate to the displayed URL (typically [http://127.0.0.1:5000](http://127
 - To make existing scripts and code work with the model make sure that it inherits from [this abstract base model class](src/models/food_classification_model.py), requiring the model class to have a classify function that takes in an image as bytes and returns an integer indicating the id of the label.
 - Examples can be found in the `src/models` directory.
 
+## Setup
+### uv
+1. This project uses uv for Python dependency management. You can install it [here](https://docs.astral.sh/uv/getting-started/installation/).
+2. Verify installation: `uv --version`
+3. Create and activate a virtual environment (Python 3.10): `uv venv`.
+4. Activate the environment (zsh/macOS): `source .venv/bin/activate` (If you don't have Python 3.10 installed, uv can install it: `uv python install 3.10`).
+5. Install dependencies
+Sync project dependencies defined in *pyproject.toml* (uses the existing *uv.lock* if present): `uv sync`.
+
+### dvc
+1. Configure the access keys to the dvc remote by running the following two commands. Replace YOUR_ACCESS_KEY and YOUR_SECRET_ACCESS_KEY with the actual keys. You can get them from Hubert.
+```bash
+uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
+uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
+```
+2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
+
 ## Project Organization
 
 ```
@@ -100,4 +117,3 @@ Then navigate to the displayed URL (typically [http://127.0.0.1:5000](http://127
 ```
 
 --------
-
