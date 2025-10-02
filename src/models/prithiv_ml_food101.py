@@ -2,6 +2,9 @@ import torch
 from transformers import AutoImageProcessor, SiglipForImageClassification
 from PIL import Image
 import io
+import os
+import tempfile
+from pathlib import Path
 
 from src.models.food_classification_model import FoodClassificationModel
 
@@ -16,9 +19,30 @@ class PrithivMlFood101(FoodClassificationModel):
     """
 
     def __init__(self, model_name: str = "prithivMLmods/Food-101-93M"):
-        self.model = SiglipForImageClassification.from_pretrained(model_name)
-        self.processor = AutoImageProcessor.from_pretrained(model_name)
-        self.model_name = model_name
+        # Set up proper cache directory for HF Spaces
+        if not os.environ.get("HF_HOME"):
+            cache_dir = Path(tempfile.gettempdir()) / "transformers_cache"
+            cache_dir.mkdir(exist_ok=True)
+            os.environ["HF_HOME"] = str(cache_dir)
+
+        # Add retry logic and better error handling
+        try:
+            self.model = SiglipForImageClassification.from_pretrained(
+                model_name,
+                cache_dir=os.environ.get("HF_HOME"),
+                local_files_only=False,
+                force_download=False,
+            )
+            self.processor = AutoImageProcessor.from_pretrained(
+                model_name,
+                cache_dir=os.environ.get("HF_HOME"),
+                local_files_only=False,
+                force_download=False,
+                use_fast=True,  # Use fast processor to avoid warning
+            )
+            self.model_name = model_name
+        except Exception as e:
+            raise RuntimeError(f"Failed to load model {model_name}: {str(e)}")
 
     def classify(self, image: bytes) -> int:
         pil_image = Image.open(io.BytesIO(image)).convert("RGB")

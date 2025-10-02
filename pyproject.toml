@@ -32,12 +32,17 @@ dependencies = [
     "pytest",
     "python-dotenv",
     "ruff",
+    "streamlit>=1.31.0",
     "torch>=2.8.0",
     "torchvision>=0.23.0",
     "tqdm>=4.67.1",
     "transformers>=4.56.2",
 ]
 requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = []
+
 
 # This makes src/ discoverable as a package
 [tool.hatch.build.targets.wheel]

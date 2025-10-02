@@ -1,0 +1,66 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Python cache and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+.env
+
+# Documentation and development files
+docs/
+references/
+reports/
+notebooks/
+tests/
+
+# Data files (too large for Docker image)
+data/
+mlruns/
+models/*.pth
+
+# Development and configuration files
+.pytest_cache/
+.coverage
+.mypy_cache/
+.ruff_cache/
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Streamlit specific
+.streamlit/
+
+# Project specific
+uv.lock
+pyproject.toml
+Makefile
+LICENSE
+streamlit/README.md
+
+# Deployment scripts
+deploy_to_hf.sh
+COMMANDS.md
+
+# Food101 HF Space (don't include in Docker)
+Food101/
