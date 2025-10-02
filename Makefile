@@ -62,6 +62,17 @@ create_environment:
 #################################################################################
 
 
+## Fine-tune ResNet-18 on Food-101 (local imagefolder or HF dataset)
+.PHONY: train-resnet18
+train-resnet18:
+	python src/train/finetune_resnet18.py --data_dir data/raw/food101 || \
+	python src/train/finetune_resnet18.py
+
+## Evaluate fine-tuned ResNet-18 on Food-101 test split (if eval script exists)
+.PHONY: eval-resnet18
+eval-resnet18:
+	python src/eval/evaluate_food101.py
+
 
 #################################################################################
 # Self Documenting Commands                                                     #

@@ -15,10 +15,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
+    "accelerate>=0.26.0",
     "dagshub>=0.6.3",
     "datasets<4.1.1",
     "dvc>=3.63.0",
     "dvc-s3>=3.2.2",
+    "evaluate>=0.4.6",
     "huggingface-hub>=0.35.0",
     "ipykernel>=6.30.1",
     "ipywidgets>=8.1.7",
