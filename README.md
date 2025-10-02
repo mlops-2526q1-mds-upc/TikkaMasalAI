@@ -65,6 +65,95 @@ uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
 ```
 2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
 
+## 🐳 Docker Setup
+
+This project has **two different Docker setups** for different purposes:
+
+### 🔧 **Local Development Docker**
+**File:** `streamlit/Dockerfile`  
+**Purpose:** Build and test locally from project root  
+**Build Command:** `make docker-build` (from project root)
+
+**Usage:**
+```bash
+make docker-build    # Build from project root
+make docker-run      # Run locally on port 7860
+make docker-test     # Build + run
+```
+
+### 🚀 **HF Spaces Deployment Docker**
+**File:** `Food101/Dockerfile`  
+**Purpose:** Deploy to Hugging Face Spaces  
+**Build Command:** Automatic on HF Spaces push
+
+**Usage:**
+```bash
+make deploy-hf       # Deploy to HF Spaces
+```
+
+### 📁 File Structure Differences
+
+#### **Local Project Structure:**
+```
+TikkaMasalAI/
+├── src/             # Source code
+├── streamlit/       # Development files
+│   ├── Dockerfile   # Local Docker config
+│   ├── app.py       # Streamlit app
+│   └── requirements.txt
+└── Food101/         # HF Spaces deployment
+    ├── Dockerfile   # HF Docker config
+    ├── app.py       # (copied from streamlit/)
+    ├── requirements.txt # (copied from streamlit/)
+    └── src/         # (copied from ../src/)
+```
+
+#### **HF Spaces Structure:**
+```
+YourSpace/
+├── Dockerfile       # HF-specific Docker config
+├── app.py           # Streamlit app (root level)
+├── requirements.txt # Dependencies (root level)
+└── src/             # Source code
+```
+
+### 🔄 Deployment Workflow
+
+1. **Develop locally** using `streamlit/` files
+2. **Test locally** with `make docker-test`
+3. **Deploy to HF** with `make deploy-hf`
+   - Copies `src/` → `Food101/src/`
+   - Copies `streamlit/app.py` → `Food101/app.py`
+   - Copies `streamlit/requirements.txt` → `Food101/requirements.txt`
+   - **Keeps existing `Food101/Dockerfile`** (HF-specific)
+
+### ⚠️ Important Notes
+
+- **Never copy `streamlit/Dockerfile` to `Food101/`** - they're different!
+- The HF Dockerfile expects files in the root directory
+- The local Dockerfile expects files in subdirectories
+- Deployment scripts handle this automatically
+
+### 🐛 Troubleshooting
+
+#### **Local build fails:**
+- Check you're running `make docker-build` from project root
+- Ensure `streamlit/Dockerfile` has correct paths
+
+#### **HF Spaces build fails:**
+- Check `Food101/Dockerfile` uses root-level paths
+- Ensure `app.py` and `requirements.txt` are in `Food101/`
+- Don't copy local Dockerfile to HF Spaces
+
+#### **Quick Fix Commands:**
+```bash
+# Fix local Docker setup
+make docker-build
+
+# Fix HF deployment
+make deploy-hf
+```
+
 ## Project Organization
 
 ```
@@ -95,6 +184,8 @@ uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
 │
 ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
 │                         generated with `pip freeze > requirements.txt`
+│
+├── scripts            <- Deployment and utility scripts
 │
 ├── setup.cfg          <- Configuration file for flake8
 │

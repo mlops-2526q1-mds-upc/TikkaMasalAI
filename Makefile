@@ -43,7 +43,57 @@ format:
 ## Run tests
 .PHONY: test
 test:
-	python -m pytest tests
+	uv run pytest tests
+
+
+## Start Streamlit app locally
+.PHONY: streamlit
+streamlit:
+	cd streamlit && uv run streamlit run app.py
+
+
+## Build Docker image locally
+.PHONY: docker-build
+docker-build:
+	docker build -f streamlit/Dockerfile -t tikka-masalai .
+
+
+## Run Docker container locally (requires docker-build first)
+.PHONY: docker-run
+docker-run:
+	docker run -p 7860:7860 tikka-masalai
+
+
+## Build and run Docker container locally
+.PHONY: docker-test
+docker-test: docker-build docker-run
+
+
+## Deploy to Hugging Face Spaces (interactive)
+.PHONY: deploy-hf
+deploy-hf:
+	./scripts/deploy_to_hf.sh
+
+
+## Sync files to HF folder without deploying
+.PHONY: sync-hf
+sync-hf:
+	@echo "📁 Syncing files to Food101/..."
+	cp -r src/ Food101/
+	cp streamlit/{app.py,requirements.txt,.dockerignore,config.toml} Food101/
+	@echo "✅ Files synced (Dockerfile maintained separately for HF)"
+
+
+## Start MLflow UI
+.PHONY: mlflow
+mlflow:
+	uv run mlflow ui
+
+
+## Start Jupyter notebook
+.PHONY: notebook
+notebook:
+	uv run jupyter notebook notebooks/
 
 
 ## Set up Python interpreter environment
