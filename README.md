@@ -6,6 +6,32 @@
 
 An MLOps project for food classification using computer vision techniques.
 
+## Setup
+### uv
+1. This project uses uv for Python dependency management. You can install it [here](https://docs.astral.sh/uv/getting-started/installation/).
+2. Verify installation: `uv --version`
+3. Create and activate a virtual environment (Python 3.10): `uv venv`.
+4. Activate the environment (zsh/macOS): `source .venv/bin/activate` (If you don't have Python 3.10 installed, uv can install it: `uv python install 3.10`).
+5. Install dependencies
+Sync project dependencies defined in *pyproject.toml* (uses the existing *uv.lock* if present): `uv sync`.
+
+### dvc
+1. Configure the access keys to the dvc remote by running the following two commands. Replace YOUR_ACCESS_KEY and YOUR_SECRET_ACCESS_KEY with the actual keys. You can get them from Hubert.
+```bash
+uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
+uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
+```
+2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
+
+### (Optional) Deploy Streamlit App on HF spaces
+- We have a streamlit app deployed on HuggingFace Spaces which lets us run inference on all the models we have created.
+- You can access the Space here: https://huggingface.co/spaces/AdrianHagen/Food101-Streamlit
+- In order to contribute to this, follow these steps:
+    1. Clone the Space repository by running: `git clone https://huggingface.co/spaces/AdrianHagen/Food101-Streamlit`
+    2. Make changes to the source code in the `src` directory or modify the files in the `Food101-Streamlit` directory. You can check how these changes look before deploying them by running: `make streamlit`.
+    3. Deploy your changes by running `make deploy-hf`.
+
+
 ## 🤖 Models
 
 ### Model Evaluation
@@ -48,112 +74,6 @@ Then navigate to the displayed URL (typically [http://127.0.0.1:5000](http://127
 - To make existing scripts and code work with the model make sure that it inherits from [this abstract base model class](src/models/food_classification_model.py), requiring the model class to have a classify function that takes in an image as bytes and returns an integer indicating the id of the label.
 - Examples can be found in the `src/models` directory.
 
-## Setup
-### uv
-1. This project uses uv for Python dependency management. You can install it [here](https://docs.astral.sh/uv/getting-started/installation/).
-2. Verify installation: `uv --version`
-3. Create and activate a virtual environment (Python 3.10): `uv venv`.
-4. Activate the environment (zsh/macOS): `source .venv/bin/activate` (If you don't have Python 3.10 installed, uv can install it: `uv python install 3.10`).
-5. Install dependencies
-Sync project dependencies defined in *pyproject.toml* (uses the existing *uv.lock* if present): `uv sync`.
-
-### dvc
-1. Configure the access keys to the dvc remote by running the following two commands. Replace YOUR_ACCESS_KEY and YOUR_SECRET_ACCESS_KEY with the actual keys. You can get them from Hubert.
-```bash
-uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
-uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
-```
-2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
-
-## 🐳 Docker Setup
-
-This project has **two different Docker setups** for different purposes:
-
-### 🔧 **Local Development Docker**
-**File:** `streamlit/Dockerfile`  
-**Purpose:** Build and test locally from project root  
-**Build Command:** `make docker-build` (from project root)
-
-**Usage:**
-```bash
-make docker-build    # Build from project root
-make docker-run      # Run locally on port 7860
-make docker-test     # Build + run
-```
-
-### 🚀 **HF Spaces Deployment Docker**
-**File:** `Food101/Dockerfile`  
-**Purpose:** Deploy to Hugging Face Spaces  
-**Build Command:** Automatic on HF Spaces push
-
-**Usage:**
-```bash
-make deploy-hf       # Deploy to HF Spaces
-```
-
-### 📁 File Structure Differences
-
-#### **Local Project Structure:**
-```
-TikkaMasalAI/
-├── src/             # Source code
-├── streamlit/       # Development files
-│   ├── Dockerfile   # Local Docker config
-│   ├── app.py       # Streamlit app
-│   └── requirements.txt
-└── Food101/         # HF Spaces deployment
-    ├── Dockerfile   # HF Docker config
-    ├── app.py       # (copied from streamlit/)
-    ├── requirements.txt # (copied from streamlit/)
-    └── src/         # (copied from ../src/)
-```
-
-#### **HF Spaces Structure:**
-```
-YourSpace/
-├── Dockerfile       # HF-specific Docker config
-├── app.py           # Streamlit app (root level)
-├── requirements.txt # Dependencies (root level)
-└── src/             # Source code
-```
-
-### 🔄 Deployment Workflow
-
-1. **Develop locally** using `streamlit/` files
-2. **Test locally** with `make docker-test`
-3. **Deploy to HF** with `make deploy-hf`
-   - Copies `src/` → `Food101/src/`
-   - Copies `streamlit/app.py` → `Food101/app.py`
-   - Copies `streamlit/requirements.txt` → `Food101/requirements.txt`
-   - **Keeps existing `Food101/Dockerfile`** (HF-specific)
-
-### ⚠️ Important Notes
-
-- **Never copy `streamlit/Dockerfile` to `Food101/`** - they're different!
-- The HF Dockerfile expects files in the root directory
-- The local Dockerfile expects files in subdirectories
-- Deployment scripts handle this automatically
-
-### 🐛 Troubleshooting
-
-#### **Local build fails:**
-- Check you're running `make docker-build` from project root
-- Ensure `streamlit/Dockerfile` has correct paths
-
-#### **HF Spaces build fails:**
-- Check `Food101/Dockerfile` uses root-level paths
-- Ensure `app.py` and `requirements.txt` are in `Food101/`
-- Don't copy local Dockerfile to HF Spaces
-
-#### **Quick Fix Commands:**
-```bash
-# Fix local Docker setup
-make docker-build
-
-# Fix HF deployment
-make deploy-hf
-```
-
 ## Project Organization
 
 ```
@@ -168,7 +88,7 @@ make deploy-hf
 │
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
-├── models             <- Trained and serialized models, model predictions, or model summaries
+├── models             <- (Deprecated) Local model storage; models now load from the Hub at runtime
 │
 ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
 │                         the creator's initials, and a short `-` delimited description, e.g.

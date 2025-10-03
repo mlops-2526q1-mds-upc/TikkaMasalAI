@@ -4,7 +4,6 @@ from PIL import Image
 import io
 import os
 import tempfile
-from pathlib import Path
 
 from src.models.food_classification_model import FoodClassificationModel
 
@@ -19,30 +18,29 @@ class PrithivMlFood101(FoodClassificationModel):
     """
 
     def __init__(self, model_name: str = "prithivMLmods/Food-101-93M"):
-        # Set up proper cache directory for HF Spaces
+        """
+        Always load from the Hugging Face Hub. No local model storage.
+        """
+
+        # Set up proper cache directory for HF Spaces (safe no-op locally)
         if not os.environ.get("HF_HOME"):
-            cache_dir = Path(tempfile.gettempdir()) / "transformers_cache"
-            cache_dir.mkdir(exist_ok=True)
+            cache_dir = tempfile.mkdtemp(prefix="transformers_cache_")
             os.environ["HF_HOME"] = str(cache_dir)
 
-        # Add retry logic and better error handling
-        try:
-            self.model = SiglipForImageClassification.from_pretrained(
-                model_name,
-                cache_dir=os.environ.get("HF_HOME"),
-                local_files_only=False,
-                force_download=False,
-            )
-            self.processor = AutoImageProcessor.from_pretrained(
-                model_name,
-                cache_dir=os.environ.get("HF_HOME"),
-                local_files_only=False,
-                force_download=False,
-                use_fast=True,  # Use fast processor to avoid warning
-            )
-            self.model_name = model_name
-        except Exception as e:
-            raise RuntimeError(f"Failed to load model {model_name}: {str(e)}")
+        cache_dir = os.environ.get("HF_HOME")
+
+        # Load from the Hub
+        self.model = SiglipForImageClassification.from_pretrained(
+            model_name,
+            cache_dir=cache_dir,
+        )
+        self.processor = AutoImageProcessor.from_pretrained(
+            model_name,
+            cache_dir=cache_dir,
+            use_fast=True,
+        )
+        self.model_name = model_name
+        self.model_path = model_name
 
     def classify(self, image: bytes) -> int:
         pil_image = Image.open(io.BytesIO(image)).convert("RGB")

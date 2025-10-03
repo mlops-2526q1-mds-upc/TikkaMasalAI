@@ -38,8 +38,6 @@ format:
 	ruff check --fix
 	ruff format
 
-
-
 ## Run tests
 .PHONY: test
 test:
@@ -49,13 +47,14 @@ test:
 ## Start Streamlit app locally
 .PHONY: streamlit
 streamlit:
-	cd streamlit && uv run streamlit run app.py
+	uv run streamlit run Food101-Streamlit/app.py
 
 
 ## Build Docker image locally
 .PHONY: docker-build
 docker-build:
-	docker build -f streamlit/Dockerfile -t tikka-masalai .
+	cp -r src/ Food101-Streamlit/src/
+	cd Food101-Streamlit && docker build -t tikka-masalai .
 
 
 ## Run Docker container locally (requires docker-build first)
@@ -73,15 +72,6 @@ docker-test: docker-build docker-run
 .PHONY: deploy-hf
 deploy-hf:
 	./scripts/deploy_to_hf.sh
-
-
-## Sync files to HF folder without deploying
-.PHONY: sync-hf
-sync-hf:
-	@echo "📁 Syncing files to Food101/..."
-	cp -r src/ Food101/
-	cp streamlit/{app.py,requirements.txt,.dockerignore,config.toml} Food101/
-	@echo "✅ Files synced (Dockerfile maintained separately for HF)"
 
 
 ## Start MLflow UI

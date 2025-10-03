@@ -2,6 +2,7 @@ import torch
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 from PIL import Image
 import io
+import os
 
 from src.models.food_classification_model import FoodClassificationModel
 
@@ -17,8 +18,23 @@ class Resnet18(FoodClassificationModel):
         preprocessor_path: str = "microsoft/resnet-18",
         model_path: str = "microsoft/resnet-18",
     ):
-        self.image_processor = AutoImageProcessor.from_pretrained(preprocessor_path)
-        self.model = AutoModelForImageClassification.from_pretrained(model_path)
+        """
+        Always load from the Hugging Face Hub. No local model storage.
+        """
+
+        cache_dir = os.environ.get("HF_HOME")
+
+        # Load from the Hub (will cache under HF_HOME if set)
+        self.image_processor = AutoImageProcessor.from_pretrained(
+            preprocessor_path, cache_dir=cache_dir
+        )
+        self.model = AutoModelForImageClassification.from_pretrained(
+            model_path, cache_dir=cache_dir
+        )
+
+        # For metadata/logging
+        self.model_path = model_path
+        self.preprocessor_path = preprocessor_path
 
     def classify(self, image: bytes) -> int:
         pil_image = Image.open(io.BytesIO(image))
