@@ -30,8 +30,12 @@ class Resnet18(FoodClassificationModel):
             preprocessor_path: Optional separate path for preprocessor.
                 If None, uses model_path for both model and preprocessor.
         """
+        self.model_path = model_path  # Store for MLflow logging
+        
         if preprocessor_path is None:
             preprocessor_path = model_path
+        
+        self.preprocessor_path = preprocessor_path  # Store for MLflow logging
             
         self.image_processor = AutoImageProcessor.from_pretrained(preprocessor_path)
         self.model = AutoModelForImageClassification.from_pretrained(model_path)
