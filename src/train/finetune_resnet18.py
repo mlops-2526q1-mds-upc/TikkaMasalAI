@@ -1,3 +1,13 @@
+"""
+Fine-tuning script for Food-101 classification.
+
+This script trains a ResNet-18 model on the Food-101 dataset.
+After training, the model can be loaded using:
+    
+    from src.models.resnet18 import Resnet18
+    model = Resnet18.load_finetuned("models/resnet18-food101")
+"""
+
 import argparse
 import os
 import glob
@@ -140,10 +150,10 @@ def main():
     parser = argparse.ArgumentParser(description="Fine-tune ResNet-18 on Food-101")
     
     # Data arguments
-    parser.add_argument("--data_dir", type=str, 
+    parser.add_argument("--data_dir", type=str,
                        default="data/raw/food101/data",
                        help="Path to directory with parquet files")
-    parser.add_argument("--train_samples", type=int, default=None, 
+    parser.add_argument("--train_samples", type=int, default=None,
                        help="Number of training samples (None = all)")
     parser.add_argument("--eval_samples", type=int, default=None,
                        help="Number of eval samples (None = all)")
@@ -230,6 +240,9 @@ def main():
     image_processor.save_pretrained(args.output_dir)
     
     print("Training complete!")
+    print(f"\nTo use this model:")
+    print(f"  from src.models.resnet18 import Resnet18")
+    print(f"  model = Resnet18.load_finetuned('{args.output_dir}')")
 
 
 if __name__ == "__main__":
