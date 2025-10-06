@@ -13,12 +13,35 @@ import pandas as pd
 import glob
 import random
 import dagshub
+import tempfile
+from contextlib import suppress
 
 from src.models.food_classification_model import FoodClassificationModel
 from src.labels import LABELS, index_to_label
 
-dagshub.init(repo_owner="HubertWojcik10", repo_name="TikkaMasalAI", mlflow=True)
-mlflow.autolog()
+# dagshub.init(repo_owner="HubertWojcik10", repo_name="TikkaMasalAI", mlflow=True)
+# mlflow.autolog()
+
+from azure.ai.ml import MLClient
+from azure.identity import DefaultAzureCredential
+
+# Enter information about your Azure Machine Learning workspace.
+subscription_id = "29088f94-884c-4de9-b423-4c03ce42f970"
+resource_group = "ml-francecentral-group"
+workspace_name = "mlops-tikkamasalai"
+
+ml_client = MLClient(
+    credential=DefaultAzureCredential(),
+    subscription_id=subscription_id,
+    resource_group_name=resource_group,
+    workspace_name=workspace_name,
+)
+
+mlflow_tracking_uri = ml_client.workspaces.get(
+    ml_client.workspace_name
+).mlflow_tracking_uri
+
+mlflow.set_tracking_uri(mlflow_tracking_uri)
 
 
 class Food101Evaluator:
@@ -294,6 +317,31 @@ class Food101Evaluator:
                     getattr(self.model, "preprocessor_path", "Unknown"),
                 )
 
+            # Log HF commit hashes (if available) for exact reproducibility
+            with suppress(Exception):
+                # Transformers models often expose the exact commit via config._commit_hash
+                hf_commit = None
+                model_obj = getattr(self.model, "model", None)
+                config = getattr(model_obj, "config", None)
+                if config is not None:
+                    hf_commit = getattr(config, "_commit_hash", None) or getattr(
+                        config, "_revision", None
+                    )
+                if hf_commit:
+                    mlflow.log_param("hf_model_commit", hf_commit)
+            with suppress(Exception):
+                proc_obj = getattr(self.model, "image_processor", None) or getattr(
+                    self.model, "processor", None
+                )
+                proc_config = getattr(proc_obj, "config", None)
+                proc_commit = None
+                if proc_config is not None:
+                    proc_commit = getattr(proc_config, "_commit_hash", None) or getattr(
+                        proc_config, "_revision", None
+                    )
+                if proc_commit:
+                    mlflow.log_param("hf_processor_commit", proc_commit)
+
             samples = self.load_validation_data()
 
             if not samples:
@@ -310,7 +358,55 @@ class Food101Evaluator:
             self.log_mlflow_metrics(results)
             self.log_mlflow_artifacts(results)
 
+            # Optionally log the underlying model weights/config for reproducibility
+            self._log_model_artifact_safe()
+
             self._print_results(results)
+
+    def _log_model_artifact_safe(self) -> None:
+        """Best-effort logging of the underlying model as MLflow artifacts.
+
+        - For Hugging Face models: saves both model and processor/image_processor using
+          save_pretrained and logs the directory as an artifact (hf_model/).
+        - For torchvision/PyTorch nn.Module models: saves state_dict as a .pt file and logs it.
+
+        This is optional and wrapped in try/except so evaluation never fails because of logging.
+        """
+        try:
+            # Try Hugging Face style first
+            model_obj = getattr(self.model, "model", None)
+            proc_obj = getattr(self.model, "image_processor", None) or getattr(
+                self.model, "processor", None
+            )
+            if hasattr(model_obj, "save_pretrained"):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    tmp_path = Path(tmpdir) / "hf_model"
+                    tmp_path.mkdir(parents=True, exist_ok=True)
+                    # Save model
+                    model_obj.save_pretrained(tmp_path)
+                    # Save processor if available
+                    if proc_obj and hasattr(proc_obj, "save_pretrained"):
+                        proc_obj.save_pretrained(tmp_path)
+                    mlflow.log_artifacts(str(tmp_path), artifact_path="hf_model")
+                return
+
+            # Fallback: raw torch.nn.Module state_dict
+            torch_module = getattr(self.model, "model", None)
+            # Import torch lazily to avoid extra dependency at import time
+            if torch_module is not None:
+                try:
+                    import torch  # type: ignore
+                except Exception:
+                    torch = None
+
+                if torch is not None and hasattr(torch_module, "state_dict"):
+                    with tempfile.TemporaryDirectory() as tmpdir:
+                        fpath = Path(tmpdir) / f"{self.model_name}_state_dict.pt"
+                        torch.save(torch_module.state_dict(), fpath)
+                        mlflow.log_artifact(str(fpath), artifact_path="pytorch_model")
+        except Exception as e:
+            # Keep silent but informative for console
+            print(f"[WARN] Skipped model artifact logging: {e}")
 
     def _print_results(self, results: Dict[str, Any]) -> None:
         """Print evaluation results to console."""

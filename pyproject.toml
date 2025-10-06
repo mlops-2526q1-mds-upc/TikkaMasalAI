@@ -15,6 +15,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
+    "azure-ai-ml>=1.17.0",
+    "azure-identity>=1.18.0",
+    "azureml-mlflow>=1.60.0.post1",
     "dagshub>=0.6.3",
     "datasets<4.1.1",
     "dvc>=3.63.0",
@@ -30,6 +33,7 @@ dependencies = [
     "pillow>=11.3.0",
     "polars>=1.0.0",
     "pyarrow>=4.0.0,<20.0.0",
+    "pynblint>=0.1.6",
     "pytest",
     "python-dotenv",
     "ruff",

@@ -44,23 +44,23 @@ def main():
         model=prithiv_model,
     )
 
-    print("\n2. Evaluating ResNet-18 on Food101 ...")
-    resnet18_food_model = Resnet18()
-    evaluate_food101(
-        experiment_name="Food101_Model_Comparison",
-        run_name="ResNet18_Transfer_50samples",
-        sample_limit=50,  # Small sample for demonstration
-        model=resnet18_food_model,
-    )
+    # print("\n2. Evaluating ResNet-18 on Food101 ...")
+    # resnet18_food_model = Resnet18()
+    # evaluate_food101(
+    #     experiment_name="Food101_Model_Comparison",
+    #     run_name="ResNet18_Transfer_50samples",
+    #     sample_limit=50,  # Small sample for demonstration
+    #     model=resnet18_food_model,
+    # )
 
-    print("\n3. Evaluating VGG16 on Food101 ...")
-    vgg16_food_model = VGG16()
-    evaluate_food101(
-        experiment_name="Food101_Model_Comparison",
-        run_name="VGG16_Transfer_50samples",
-        sample_limit=50,  # Small sample for demonstration
-        model=vgg16_food_model,
-    )
+    # print("\n3. Evaluating VGG16 on Food101 ...")
+    # vgg16_food_model = VGG16()
+    # evaluate_food101(
+    #     experiment_name="Food101_Model_Comparison",
+    #     run_name="VGG16_Transfer_50samples",
+    #     sample_limit=50,  # Small sample for demonstration
+    #     model=vgg16_food_model,
+    # )
 
 
 if __name__ == "__main__":
