@@ -90,7 +90,6 @@ def load_data(data_dir: str, train_samples: int = None, eval_samples: int = None
         "image": Image(),
         "label": ClassLabel(names=LABELS),
     })
-    print(f"Features: {features}")
     
     train_ds = Dataset.from_dict(
         {"image": train_images, "label": train_labels}, 
