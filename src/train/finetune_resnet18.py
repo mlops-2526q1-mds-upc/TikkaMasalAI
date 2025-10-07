@@ -92,11 +92,11 @@ def load_data(data_dir: str, train_samples: int = None, eval_samples: int = None
     })
     
     train_ds = Dataset.from_dict(
-        {"image": train_images, "label": train_labels}, 
+        {"image": train_images, "label": train_labels},
         features=features
     )
     val_ds = Dataset.from_dict(
-        {"image": val_images, "label": val_labels}, 
+        {"image": val_images, "label": val_labels},
         features=features
     )
     print("Loaded train and val dataset")
@@ -146,6 +146,7 @@ def compute_metrics_fn(eval_pred):
 
 
 def main():
+    """Fine-tune ResNet-18 on Food-101."""
     parser = argparse.ArgumentParser(description="Fine-tune ResNet-18 on Food-101")
     
     # Data arguments
@@ -239,8 +240,8 @@ def main():
     image_processor.save_pretrained(args.output_dir)
     
     print("Training complete!")
-    print(f"\nTo use this model:")
-    print(f"  from src.models.resnet18 import Resnet18")
+    print("\nTo use this model:")
+    print("  from src.models.resnet18 import Resnet18")
     print(f"  model = Resnet18.load_finetuned('{args.output_dir}')")
 
 
