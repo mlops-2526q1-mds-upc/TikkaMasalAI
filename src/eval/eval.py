@@ -10,6 +10,7 @@ from src.models.resnet18 import Resnet18
 from src.models.prithiv_ml_food101 import PrithivMlFood101
 from src.eval.evaluate_food101 import Food101Evaluator
 from src.models.food_classification_model import FoodClassificationModel
+import argparse
 
 
 def evaluate_food101(
@@ -29,6 +30,19 @@ def evaluate_food101(
 def main():
     """Demonstrate evaluation with multiple model architectures."""
 
+    parser = argparse.ArgumentParser(description="Evaluate models on Food101")
+    parser.add_argument(
+        "--resnet_model_path",
+        type=str,
+        default=None,
+        help=(
+            "Optional path or HF model ID for ResNet-18. If provided, the model "
+            "is loaded from this path (e.g., a fine-tuned checkpoint). If not "
+            "provided, the base 'microsoft/resnet-18' weights are used."
+        ),
+    )
+    args = parser.parse_args()
+
     print("=" * 90)
     print("Multi-Model Evaluation: VGG16 vs ResNet-18 vs PrithivMlFood101")
 
@@ -45,7 +59,10 @@ def main():
     )
 
     print("\n2. Evaluating ResNet-18 on Food101 ...")
-    resnet18_food_model = Resnet18()
+    if args.resnet_model_path:
+        resnet18_food_model = Resnet18.from_pretrained(args.resnet_model_path)
+    else:
+        resnet18_food_model = Resnet18()
     evaluate_food101(
         experiment_name="Food101_Model_Comparison",
         run_name="ResNet18_Transfer_50samples",

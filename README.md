@@ -43,6 +43,23 @@ uv run mlflow ui
 
 Then navigate to the displayed URL (typically [http://127.0.0.1:5000](http://127.0.0.1:5000)) to view the interactive dashboard.
 
+### Fine-tuning ResNet-18
+
+Run a short fine-tuning job on Food-101:
+
+```bash
+uv run -m src.train.finetune_resnet18 --epochs 2 --train_samples 1000 --eval_samples 200 --output_dir models/resnet18-food101-2e-1k
+```
+
+- You can specify various parameters (see all available args in `src/train/finetune_resnet18.py`).
+- To evaluate afterward:
+
+```bash
+uv run -m src.eval.eval --resnet_model_path models/resnet18-food101-2e-1k
+```
+
+Replace the path with any other trained model directory as needed.
+
 ### Adding New Models
 - To add new models you can create a new class with the name of the model under `src/models`.
 - To make existing scripts and code work with the model make sure that it inherits from [this abstract base model class](src/models/food_classification_model.py), requiring the model class to have a classify function that takes in an image as bytes and returns an integer indicating the id of the label.
