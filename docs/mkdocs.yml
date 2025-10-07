@@ -1,4 +1,11 @@
 site_name: Tikka MasalAI
-# 
 site_author: Team Tikka MasalAI
-# 
+
+nav:
+  - Home: index.md
+  - Contributing: contributing.md
+  - Development:
+      - Code Style: development/code_style.md
+
+plugins:
+  - include-markdown
