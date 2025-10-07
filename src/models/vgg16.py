@@ -1,9 +1,11 @@
+import io
+
+from PIL import Image
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 import torchvision.models as models
-from PIL import Image
-import io
+import torchvision.transforms as transforms
+
 from src.models.food_classification_model import FoodClassificationModel
 
 
@@ -23,9 +25,7 @@ class VGG16(FoodClassificationModel):
                 transforms.Resize(256),
                 transforms.CenterCrop(224),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ]
         )
 

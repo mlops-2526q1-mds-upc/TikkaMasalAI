@@ -5,12 +5,14 @@ Example script demonstrating how to evaluate multiple models on different datase
 This script shows how to use the enhanced evaluation framework
 with different model implementations including VGG16, ResNet18, and PrithivMlFood101.
 """
-from src.models.vgg16 import VGG16
-from src.models.resnet18 import Resnet18
-from src.models.prithiv_ml_food101 import PrithivMlFood101
+
+import argparse
+
 from src.eval.evaluate_food101 import Food101Evaluator
 from src.models.food_classification_model import FoodClassificationModel
-import argparse
+from src.models.prithiv_ml_food101 import PrithivMlFood101
+from src.models.resnet18 import Resnet18
+from src.models.vgg16 import VGG16
 
 
 def evaluate_food101(
@@ -21,9 +23,7 @@ def evaluate_food101(
     run_name: str = None,
 ):
     """Main evaluation function."""
-    evaluator = Food101Evaluator(
-        model, experiment_name, sample_limit, random_seed, run_name
-    )
+    evaluator = Food101Evaluator(model, experiment_name, sample_limit, random_seed, run_name)
     evaluator.run_evaluation()
 
 

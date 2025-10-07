@@ -1,7 +1,8 @@
+import io
+
+from PIL import Image
 import torch
 from transformers import AutoImageProcessor, SiglipForImageClassification
-from PIL import Image
-import io
 
 from src.models.food_classification_model import FoodClassificationModel
 
