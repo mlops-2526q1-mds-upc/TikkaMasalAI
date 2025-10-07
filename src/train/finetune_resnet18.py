@@ -12,7 +12,6 @@ import argparse
 import os
 import glob
 import io
-from typing import Dict, Any
 
 import numpy as np
 import torch
@@ -39,7 +38,11 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def load_data(data_dir: str, train_samples: int = None, eval_samples: int = None):
+def load_data(
+    data_dir: str,
+    train_samples: int | None = None,
+    eval_samples: int | None = None
+) -> tuple[Dataset, Dataset]:
     """
     Load parquet-based Food-101 dataset with optional sampling.
     
@@ -58,7 +61,10 @@ def load_data(data_dir: str, train_samples: int = None, eval_samples: int = None
     
     print(f"Found {len(train_files)} train files and {len(val_files)} validation files")
     
-    def read_parquet_files(files, max_samples=None):
+    def read_parquet_files(
+        files: list[str],
+        max_samples: int | None = None
+    ) -> tuple[list[PILImage.Image], list[int]]:
         images = []
         labels = []
         
@@ -104,16 +110,20 @@ def load_data(data_dir: str, train_samples: int = None, eval_samples: int = None
     return train_ds, val_ds
 
 
-def prepare_datasets(raw_train, raw_eval, image_processor):
+def prepare_datasets(
+    raw_train: Dataset,
+    raw_eval: Dataset,
+    image_processor: AutoImageProcessor
+) -> tuple[Dataset, Dataset]:
     """Apply transforms to datasets."""
     
-    def train_transform(examples: Dict[str, Any]) -> Dict[str, Any]:
+    def train_transform(examples: dict[str, any]) -> dict[str, any]:
         images = [img.convert("RGB") for img in examples["image"]]
         processed = image_processor(images, return_tensors="pt")
         processed["labels"] = examples["label"]
         return processed
     
-    def eval_transform(examples: Dict[str, Any]) -> Dict[str, Any]:
+    def eval_transform(examples: dict[str, any]) -> dict[str, any]:
         images = [img.convert("RGB") for img in examples["image"]]
         processed = image_processor(images, return_tensors="pt")
         processed["labels"] = examples["label"]
@@ -125,7 +135,12 @@ def prepare_datasets(raw_train, raw_eval, image_processor):
     return train_ds, eval_ds
 
 
-def build_model(model_name: str, num_labels: int, id2label: dict, label2id: dict):
+def build_model(
+    model_name: str,
+    num_labels: int,
+    id2label: dict[int, str],
+    label2id: dict[str, int]
+) -> AutoModelForImageClassification:
     """Load and configure model for fine-tuning."""
     model = AutoModelForImageClassification.from_pretrained(
         model_name,
@@ -137,7 +152,7 @@ def build_model(model_name: str, num_labels: int, id2label: dict, label2id: dict
     return model
 
 
-def compute_metrics_fn(eval_pred):
+def compute_metrics_fn(eval_pred: tuple[np.ndarray, np.ndarray]) -> dict[str, float]:
     """Compute accuracy metrics."""
     accuracy = evaluate.load("accuracy")
     logits, labels = eval_pred
@@ -145,7 +160,7 @@ def compute_metrics_fn(eval_pred):
     return {"accuracy": accuracy.compute(predictions=preds, references=labels)["accuracy"]}
 
 
-def main():
+def main() -> None:
     """Fine-tune ResNet-18 on Food-101."""
     parser = argparse.ArgumentParser(description="Fine-tune ResNet-18 on Food-101")
     
