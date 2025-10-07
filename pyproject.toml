@@ -38,6 +38,7 @@ dependencies = [
     "torchvision==0.17.2",
     "tqdm>=4.67.1",
     "transformers>=4.56.2",
+    "pre-commit>=4.3.0",
 ]
 requires-python = ">=3.10,<3.13"  # Temporarily cap <3.13 because torch==2.2.2 has no cp313 wheels
 
@@ -50,11 +51,14 @@ required-environments = ["sys_platform == 'darwin' and platform_machine == 'x86_
 
 [tool.ruff]
 line-length = 99
-src = ["src"]
-include = ["pyproject.toml", "src/**/*.py"]
+src = ["src", "tests"]
+include = ["pyproject.toml", "src/**/*.py", "tests/**/*.py"]
 
 [tool.ruff.lint]
 extend-select = ["I"]  # Add import sorting
+
+# Per-file ignores moved into the `lint` section (prevents deprecation warnings)
+per-file-ignores = { "tests/**" = ["D101", "D102", "D103"] }
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

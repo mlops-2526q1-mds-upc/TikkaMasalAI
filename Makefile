@@ -16,9 +16,6 @@ PYTHON_INTERPRETER = python
 requirements:
 	uv sync
 	
-
-
-
 ## Delete all compiled Python files
 .PHONY: clean
 clean:
