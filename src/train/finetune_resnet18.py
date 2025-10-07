@@ -27,6 +27,8 @@ from transformers import (
 import evaluate
 from src.labels import LABELS
 
+from codecarbon import EmissionsTracker
+
 
 def set_seed(seed: int) -> None:
     """Set random seeds for reproducibility."""
@@ -247,7 +249,10 @@ def main() -> None:
     
     # Train
     print("Starting training...")
+    tracker = EmissionsTracker(output_dir="src/train")  # Save emissions file to src/train
+    tracker.start() # Start tracking
     trainer.train()
+    tracker.stop() # Stop tracking
     
     # Save final model
     print(f"Saving model to {args.output_dir}")
