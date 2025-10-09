@@ -27,6 +27,7 @@ from transformers import (
 )
 
 from src.labels import LABELS
+from codecarbon import EmissionsTracker
 
 
 def set_seed(seed: int) -> None:
@@ -240,7 +241,10 @@ def main() -> None:
 
     # Train
     print("Starting training...")
+    tracker = EmissionsTracker(output_dir="reports")  # Save emissions file to src/train
+    tracker.start()  # Start tracking
     trainer.train()
+    tracker.stop()  # Stop tracking
 
     # Save final model
     print(f"Saving model to {args.output_dir}")
