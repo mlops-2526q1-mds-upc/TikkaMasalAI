@@ -15,10 +15,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
+    "accelerate>=0.26.0",
     "dagshub>=0.6.3",
     "dvc==3.63.0",
     "ruamel-yaml-clib==0.2.8",
     "dvc-s3>=3.2.2",
+    "evaluate>=0.4.6",
     "huggingface-hub>=0.35.0",
     "ipykernel>=6.30.1",
     "ipywidgets>=8.1.7",
@@ -36,11 +38,12 @@ dependencies = [
     "torchvision==0.17.2",
     "tqdm>=4.67.1",
     "transformers>=4.56.2",
+    "pre-commit>=4.3.0",
     "great-expectations>=0.18.22",
     "loguru>=0.7.3",
     "deepchecks"
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"  # Temporarily cap <3.13 because torch==2.2.2 has no cp313 wheels
 
 # This makes src/ discoverable as a package
 [tool.hatch.build.targets.wheel]
@@ -48,6 +51,21 @@ packages = ["src"]
 
 [tool.uv]
 required-environments = ["sys_platform == 'darwin' and platform_machine == 'x86_64'"]
+
+[tool.ruff]
+line-length = 99
+src = ["src", "tests"]
+include = ["pyproject.toml", "src/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+# Per-file ignores moved into the `lint` section (prevents deprecation warnings)
+per-file-ignores = { "tests/**" = ["D101", "D102", "D103"] }
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 pythonpath = "."

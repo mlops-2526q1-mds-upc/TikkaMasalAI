@@ -5,17 +5,18 @@ Food101 evaluation script for model evaluation with MLflow tracking.
 This script evaluates models on the Food101 dataset with MLflow experiment tracking.
 """
 
-from typing import List, Dict, Tuple, Any, Union
-from pathlib import Path
-import mlflow
 from datetime import datetime
-import pandas as pd
 import glob
+from pathlib import Path
 import random
-import dagshub
+from typing import Any, Dict, List, Tuple, Union
 
-from src.models.food_classification_model import FoodClassificationModel
+import dagshub
+import mlflow
+import pandas as pd
+
 from src.labels import LABELS, index_to_label
+from src.models.food_classification_model import FoodClassificationModel
 
 dagshub.init(repo_owner="HubertWojcik10", repo_name="TikkaMasalAI", mlflow=True)
 mlflow.autolog()
@@ -49,9 +50,7 @@ class Food101Evaluator:
         self.random_seed = random_seed
         self.custom_run_name = run_name
         self.model_name = self.model.__class__.__name__
-        self.data_dir = (
-            Path(__file__).parent.parent.parent / "data" / "raw" / "food101" / "data"
-        )
+        self.data_dir = Path(__file__).parent.parent.parent / "data" / "raw" / "food101" / "data"
 
     def load_validation_data(self) -> List[Tuple[bytes, int]]:
         """
@@ -167,11 +166,11 @@ class Food101Evaluator:
                 if verbose and i < 10:  # Print first 10 predictions
                     status = "✓" if is_correct else "✗"
                     print(
-                        f"Sample {i+1:2d}: {status} True='{LABELS[true_index]:25s}' (idx: {true_index}) | Predicted='{predicted_label_name}' (idx: {predicted_index})"
+                        f"Sample {i + 1:2d}: {status} True='{LABELS[true_index]:25s}' (idx: {true_index}) | Predicted='{predicted_label_name}' (idx: {predicted_index})"
                     )
 
             except Exception as e:
-                print(f"Error processing sample {i+1}: {e}")
+                print(f"Error processing sample {i + 1}: {e}")
                 predictions.append("ERROR")
                 ground_truths.append(true_index)
 
@@ -181,9 +180,7 @@ class Food101Evaluator:
 
         # Calculate accuracy using dataset-specific method
         accuracy = self.calculate_accuracy(predictions, ground_truths)
-        success_rate = (
-            successful_predictions / total_samples if total_samples > 0 else 0
-        )
+        success_rate = successful_predictions / total_samples if total_samples > 0 else 0
 
         results = {
             "total_samples": total_samples,
@@ -236,13 +233,13 @@ class Food101Evaluator:
             else "N/A"
         )
         summary = f"""{self.model_name} {self.DATASET_NAME} Evaluation Summary
-            ========================================={'=' * len(self.DATASET_NAME)}
+            ========================================={"=" * len(self.DATASET_NAME)}
             Model: {self.model_name} ({model_source})
             Dataset: {self.DATASET_NAME} validation set
-            Samples: {results['total_samples']}
-            Success Rate: {results['success_rate']:.2%}
-            Accuracy: {results['accuracy']:.2%}
-            Correct Predictions: {results['correct_predictions']}
+            Samples: {results["total_samples"]}
+            Success Rate: {results["success_rate"]:.2%}
+            Accuracy: {results["accuracy"]:.2%}
+            Correct Predictions: {results["correct_predictions"]}
         """
 
         summary_file = f"{self.DATASET_NAME.lower()}_evaluation_summary.txt"
@@ -285,9 +282,7 @@ class Food101Evaluator:
 
             # Log model-specific parameters if available
             if hasattr(self.model, "model_path"):
-                mlflow.log_param(
-                    "model_source", getattr(self.model, "model_path", "Unknown")
-                )
+                mlflow.log_param("model_source", getattr(self.model, "model_path", "Unknown"))
             if hasattr(self.model, "preprocessor_path"):
                 mlflow.log_param(
                     "preprocessor_path",

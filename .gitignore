@@ -195,6 +195,7 @@ ssh-key.pub
 ssh-key
 
 # models
+/models/
 *.pth
 
 # images
