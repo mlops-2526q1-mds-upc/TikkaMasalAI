@@ -12,13 +12,16 @@ from src.models.vgg16 import VGG16
 def prithiv_pipe():
     return PrithivMlFood101()
 
+
 @pytest.fixture(scope="module")
 def resnet_pipe():
     return Resnet18()
 
+
 @pytest.fixture(scope="module")
 def vgg_pipe():
     return VGG16()
+
 
 @pytest.fixture
 def valid_image_bytes():
@@ -27,6 +30,7 @@ def valid_image_bytes():
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG")
     return buffer.getvalue()  # Return bytes instead of tensor
+
 
 @pytest.mark.parametrize(
     "expected_label",

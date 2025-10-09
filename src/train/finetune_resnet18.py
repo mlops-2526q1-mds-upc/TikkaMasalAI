@@ -13,6 +13,7 @@ import glob
 import io
 import os
 
+from codecarbon import EmissionsTracker
 from datasets import ClassLabel, Dataset, Features, Image
 import evaluate
 import numpy as np
@@ -27,7 +28,6 @@ from transformers import (
 )
 
 from src.labels import LABELS
-from codecarbon import EmissionsTracker
 
 
 def set_seed(seed: int) -> None:

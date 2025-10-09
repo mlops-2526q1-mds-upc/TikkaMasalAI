@@ -10,6 +10,7 @@ def data_dir():
     """Fixture to provide the path to the raw data directory."""
     return "./data/raw/food101"
 
+
 def test_data_download(data_dir):
     """Test that the data is downloaded correctly."""
     # Ensure the directory exists
@@ -23,6 +24,7 @@ def test_data_download(data_dir):
     for file in expected_files:
         file_path = os.path.join(data_dir, "data", file)
         assert os.path.exists(file_path), f"Expected file {file} is missing."
+
 
 def test_snapshot_download(data_dir):
     """Test the snapshot_download function."""

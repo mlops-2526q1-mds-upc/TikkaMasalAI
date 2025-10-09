@@ -12,6 +12,7 @@ def clean_data_dir():
     """Fixture to provide the path to the clean data directory."""
     return "./data/raw/food101/data"
 
+
 def test_clean_data_download(clean_data_dir):
     """Test that the clean data is downloaded correctly."""
     # Ensure the directory exists
@@ -22,6 +23,7 @@ def test_clean_data_download(clean_data_dir):
     ]
     for file in expected_files:
         assert os.path.exists(os.path.join(clean_data_dir, file)), f"{file} missing"
+
 
 def test_clean_data_validation(clean_data_dir):
     """Test the clean data using Deepchecks."""
@@ -68,4 +70,3 @@ def test_clean_data_validation(clean_data_dir):
     # Assert no failed conditions
     assert not failed_mixed, "MixedNulls check failed."
     assert not failed_mismatch, "CategoryMismatchTrainTest check failed."
-
