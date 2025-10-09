@@ -10,13 +10,12 @@ stages:
     outs:
     - path: data/raw/food101_pipeline
       hash: md5
-      md5: 986e77230d0588221d5ace1ed4efe321.dir
-      size: 5059985527
+      md5: ac458ff41bc778bb9db8e197fa68182d.dir
+      size: 5059985531
       nfiles: 40
   train:
-    cmd: uv run python -m src.train.finetune_resnet18 --epochs 1 --train_samples
-      2000 --eval_samples 200 --output_dir models/resnet18-food101-1e-2k 
-      --data_dir data/raw/food101_pipeline/data
+    cmd: uv run python -m src.train.finetune_resnet18 --epochs 1 --train_samples 2000
+      --eval_samples 200 --output_dir models/resnet18-food101-1e-2k --data_dir data/raw/food101_pipeline/data
     deps:
     - path: src/train/finetune_resnet18.py
       hash: md5
@@ -29,8 +28,7 @@ stages:
       size: 179850960
       nfiles: 12
   eval:
-    cmd: uv run python -m src.eval.eval --resnet_model_path 
-      models/resnet18-food101-1e-2k
+    cmd: uv run python -m src.eval.eval --resnet_model_path models/resnet18-food101-1e-2k
     deps:
     - path: models/resnet18-food101-1e-2k
       hash: md5
