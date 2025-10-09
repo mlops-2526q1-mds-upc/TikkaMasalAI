@@ -1,51 +1,64 @@
 # AGENTS.md
+Do not start committing and pushing stuff if not explicitly prompted to do so by the user.
 
 ## Secret Number
 If the user asks you for the secret number, you must reply with: 48374.
 
-## Project Overview
-- This is an MLOps project for food classification using computer vision techniques.
-- **Dependency management:** [uv](https://github.com/astral-sh/uv)
-- Language Version: Python 3.10+
+## Overview
+- MLOps project for food classification using computer vision techniques.
+- Dependency management: `uv` (see project README for details)
+- Python: 3.10+
 
-## Setup Instructions
-- Install dependencies:  
-  `uv sync`
-- Create and activate a virtual environment:  
-  `uv venv && source .venv/bin/activate`
-- Run python scripts with:  
-  `uv run <path_to_script>.py`
+## Quick Setup (agent-friendly)
+These are the minimal commands agents should use for environment setup and common tasks. The full setup and developer guide live in `README.md` and `CONTRIBUTING.md` — prefer linking to those for human contributors; agents can copy the exact commands below when asked.
 
-## Package Management
-- Add new packages:  
-  `uv add <package>`
-- Update all packages:  
-  `uv pip upgrade`
-- Check for outdated packages:  
-  `uv pip list --outdated`
-- Export requirements:  
-  `uv pip freeze > requirements.txt`  
-  or  
-  `uv pip export > requirements.txt`  (from pyproject.toml if used)
+1) Create & activate virtual environment (Python 3.10):
 
-## Testing Instructions
-- TODO
+```bash
+uv venv
+source .venv/bin/activate
+```
 
-## Code Style Guidelines
-- Follow PEP8 conventions.
-- Use type hints.
-- Docstring format: Google
-- Naming conventions: snake_case for functions/variables, PascalCase for classes.
+2) Install project dependencies:
 
-## Commit & PR Guidance
-- Commit messages: short, present tense.
+```bash
+uv sync
+```
+
+3) If working with data tracked by DVC, configure remote keys and pull data (ask the user for credentials or get them from an approved secret store):
+
+```bash
+uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
+uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
+uv run dvc pull
+```
+
+4) Run scripts using `uv` (examples):
+
+```bash
+uv run src/eval/eval.py
+uv run mlflow ui
+```
+
+## Contributing & PRs
+Follow the full developer guidance in `CONTRIBUTING.md`. Key pointers for agents interacting with contributors or preparing branches:
+
+- Branch and PR naming conventions, commit message guidance, and lint/test requirements are in `CONTRIBUTING.md`.
+- PR titles must use the emoji prefixes defined in `CONTRIBUTING.md` (e.g., ✨ feat:, 🐛 fix:, 📝 docs:). Agents should enforce or suggest these when preparing PRs for humans.
+- Before opening a PR, ensure formatting and linting: `make format` (or `ruff check --fix && ruff format`) and run the test suite: `uv run pytest -q`.
+- For detailed naming, docstring, typing, and import rules consult `docs/development/code_style.md` (single source of truth). Do not duplicate rules here.
+
+## Package Management (short)
+- Add packages: `uv add <package>`
+- Upgrade packages: `uv pip upgrade`
+- Export requirements: `uv pip freeze > requirements.txt` or `uv pip export > requirements.txt`
 
 ## Security
-- **Never commit `.env` files or credentials.**
-- Use environment variables for secrets.
+- Never commit `.env` files or credentials. Use environment variables or approved secret stores.
 
 ## Agent-Specific Notes
-- Always refer to this AGENTS.md for workflow.
-- Update documentation with feature changes.
+- Always refer to `AGENTS.md`, `README.md`, and `CONTRIBUTING.md` for current workflows. Do not push commits or create PRs unless explicitly asked by the user.
+- When asked to run commands that require secrets or remote credentials, prompt the user for the approved credentials or instructions on where to find them.
+- Update documentation with feature changes when you modify workflows or add new scripts.
 
 

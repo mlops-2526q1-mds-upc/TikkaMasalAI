@@ -35,8 +35,6 @@ format:
 	ruff check --fix
 	ruff format
 
-
-
 ## Run tests
 .PHONY: test
 test:
@@ -69,6 +67,33 @@ train-resnet18:
 .PHONY: eval-resnet18
 eval-resnet18:
 	python src/eval/evaluate_food101.py
+
+## Build the documentation site (MkDocs)
+.PHONY: docs-build
+docs-build:
+	uv run mkdocs build --strict -f docs/mkdocs.yml
+
+## Serve documentation locally with live reload
+.PHONY: docs-serve
+docs-serve:
+	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8000
+
+.PHONY: docs
+docs:
+	@echo "Building docs..."
+	$(MAKE) docs-build
+	@echo "Starting docs server..."
+	# Run the server in the background
+	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8000 & \
+	SERVER_PID=$$!; \
+	sleep 1; \
+	if command -v open >/dev/null 2>&1; then \
+	  echo "Opening browser at http://127.0.0.1:8000"; \
+	  open http://127.0.0.1:8000; \
+	fi; \
+	echo "Docs server running with PID $$SERVER_PID (press CTRL+C to stop)"; \
+	wait $$SERVER_PID
+
 
 
 #################################################################################
