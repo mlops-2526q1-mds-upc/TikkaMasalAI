@@ -1,10 +1,11 @@
 import os
-import pytest 
-import pandas as pd 
-from src.data.download_data import snapshot_download 
-from deepchecks.tabular import Dataset 
-from deepchecks.tabular.checks import MixedNulls, CategoryMismatchTrainTest 
+
+from deepchecks.tabular import Dataset
+from deepchecks.tabular.checks import CategoryMismatchTrainTest, MixedNulls
 from loguru import logger
+import pandas as pd
+import pytest
+
 
 @pytest.fixture
 def clean_data_dir():

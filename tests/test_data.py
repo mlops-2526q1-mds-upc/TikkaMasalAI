@@ -1,6 +1,9 @@
-import pytest
 import os
+
+import pytest
+
 from src.data.download_data import snapshot_download
+
 
 @pytest.fixture
 def data_dir():

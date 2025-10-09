@@ -1,11 +1,12 @@
+import io
+
+from PIL import Image
 import pytest
+
 from src.models.prithiv_ml_food101 import PrithivMlFood101
 from src.models.resnet18 import Resnet18
 from src.models.vgg16 import VGG16
-from PIL import Image
-import io
-import torch
-from torchvision import transforms
+
 
 @pytest.fixture(scope="module")
 def prithiv_pipe():
