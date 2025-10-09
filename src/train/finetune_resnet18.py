@@ -13,6 +13,7 @@ import glob
 import io
 import os
 
+from codecarbon import EmissionsTracker
 from datasets import ClassLabel, Dataset, Features, Image
 import evaluate
 import numpy as np
@@ -240,7 +241,10 @@ def main() -> None:
 
     # Train
     print("Starting training...")
+    tracker = EmissionsTracker(output_dir="reports")  # Save emissions file to src/train
+    tracker.start()  # Start tracking
     trainer.train()
+    tracker.stop()  # Stop tracking
 
     # Save final model
     print(f"Saving model to {args.output_dir}")
