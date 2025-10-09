@@ -41,7 +41,8 @@ dependencies = [
     "pre-commit>=4.3.0",
     "great-expectations>=0.18.22",
     "loguru>=0.7.3",
-    "deepchecks"
+    "deepchecks",
+    "codecarbon>=3.0.7",
 ]
 requires-python = ">=3.10,<3.13"  # Temporarily cap <3.13 because torch==2.2.2 has no cp313 wheels
 
