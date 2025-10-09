@@ -1,4 +1,5 @@
 import sys
+
 from huggingface_hub import snapshot_download
 
 local_dir = sys.argv[1] if len(sys.argv) > 1 else "./data/raw/food101"
