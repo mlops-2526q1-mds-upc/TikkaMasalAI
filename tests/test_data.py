@@ -11,4 +11,3 @@ def test_labels_non_empty():
     """LABELS should contain at least one class name."""
     assert isinstance(LABELS, list)
     assert len(LABELS) >= 1
-
