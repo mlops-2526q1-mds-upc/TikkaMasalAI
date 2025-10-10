@@ -15,18 +15,17 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Callable, Sequence
-import pandas as pd
 
 import numpy as np
+import pandas as pd
 from PIL import Image as PILImage
+import shap
 import torch
 
-import shap
-
 from src.labels import LABELS
+from src.models.prithiv_ml_food101 import PrithivMlFood101
 from src.models.resnet18 import Resnet18
 from src.models.vgg16 import VGG16
-from src.models.prithiv_ml_food101 import PrithivMlFood101
 
 
 def set_seed(seed: int) -> None:
