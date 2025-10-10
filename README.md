@@ -78,6 +78,11 @@ uv run -m src.train.finetune_resnet18 --epochs 2 --train_samples 1000 --eval_sam
 uv run -m src.eval.eval --resnet_model_path models/resnet18-food101-2e-1k
 ```
 
+To evaluate with shap:
+```bash
+uv run -m src.eval.shap_qa --model resnet18 --model-path models/resnet18-food101-2e-1k
+```
+
 Replace the path with any other trained model directory as needed.
 
 ### Adding New Models

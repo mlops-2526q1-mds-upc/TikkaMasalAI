@@ -14,7 +14,7 @@ import io
 import json
 import os
 from pathlib import Path
-from typing import Callable, Iterable, List, Sequence, Tuple
+from typing import Any, Callable, Sequence
 import pandas as pd
 
 import numpy as np
@@ -169,17 +169,22 @@ def run_shap_qa(
     background_images = [img for img, _ in samples[:background_k]]
     eval_images = [img for img, _ in samples[background_k:background_k + eval_n]]
 
+    # Normalize image sizes to a fixed resolution expected by SHAP and models
+    target_size = (224, 224)
+    background_images = [img.resize(target_size, resample=PILImage.BILINEAR) for img in background_images]
+    eval_images = [img.resize(target_size, resample=PILImage.BILINEAR) for img in eval_images]
+
     predict_fn = make_predict_fn(model_key, model)
 
     # SHAP image masker operates on HxWxC uint8 arrays; convert PIL to numpy
-    to_np = lambda im: np.array(im)
-    background_np = list(map(to_np, background_images))
-    eval_np = list(map(to_np, eval_images))
+    # FIX: Stack into a single array instead of keeping as list
+    background_np = np.stack([np.array(img) for img in background_images], axis=0)
+    eval_np = np.stack([np.array(img) for img in eval_images], axis=0)
 
     masker = shap.maskers.Image("inpaint_telea", background_np[0].shape)
 
     # After creating predict_fn, add this test:
-    test_pred = predict_fn(eval_np[0:1])
+    test_pred = predict_fn([eval_images[0]])
     print(f"Test prediction shape: {test_pred.shape}, sum: {test_pred.sum()}")
     assert test_pred.shape == (1, 101), f"Expected shape (1, 101), got {test_pred.shape}"
 
@@ -212,11 +217,19 @@ def run_shap_qa(
 
     # Save raw attributions for reproducibility (compressed)
     try:
-        # shap_values is a Explanation object; save the .values and data indices
+        # Support both a single Explanation and a list of Explanations
+        if isinstance(shap_values, list):
+            values_arr = np.stack([sv.values for sv in shap_values], axis=0)
+            base_values_arr = np.stack([sv.base_values for sv in shap_values], axis=0)
+        else:
+            sv_any: Any = shap_values
+            values_arr = sv_any.values
+            base_values_arr = sv_any.base_values
+
         np.savez_compressed(
             arrays_dir / "shap_values_first_batch.npz",
-            values=shap_values.values,
-            base_values=shap_values.base_values,
+            values=values_arr,
+            base_values=base_values_arr,
         )
     except Exception as e:
         print(f"Saving arrays failed: {e}")
@@ -258,5 +271,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

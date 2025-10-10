@@ -1,0 +1,7 @@
+{
+  "model": "resnet18",
+  "background_k": 24,
+  "eval_n": 16,
+  "seed": 42,
+  "data_dir": "/Users/hubert/Documents/mlopsv2/TikkaMasalAI/data/raw/food101/data"
+}
