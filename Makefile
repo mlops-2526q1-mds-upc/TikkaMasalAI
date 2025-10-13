@@ -63,10 +63,10 @@ train-resnet18:
 	python src/train/finetune_resnet18.py --data_dir data/raw/food101 || \
 	python src/train/finetune_resnet18.py
 
-## Evaluate fine-tuned ResNet-18 on Food-101 test split (if eval script exists)
-.PHONY: eval-resnet18
-eval-resnet18:
-	python src/eval/evaluate_food101.py
+## Evaluate models using the unified evaluation script (MLflow tracking)
+.PHONY: eval
+eval:
+	uv run src/eval/eval.py
 
 ## Build the documentation site (MkDocs)
 .PHONY: docs-build
