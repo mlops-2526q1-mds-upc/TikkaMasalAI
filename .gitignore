@@ -200,3 +200,6 @@ ssh-key
 
 # images
 *.png
+
+# shap
+.npz
