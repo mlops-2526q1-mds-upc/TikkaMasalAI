@@ -23,6 +23,55 @@ uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
 ```
 2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
 
+## Makefile quick reference
+New to the project? The Makefile bundles common tasks so you don’t have to remember long commands.
+
+- Show all available commands and short descriptions (default):
+
+```bash
+make
+# or
+make help
+```
+
+Core environment and hygiene:
+- `make create_environment` – Create a uv virtualenv for Python 3.10 and print activation hints
+- `make requirements` – Install project dependencies via uv (uses pyproject.toml/uv.lock)
+- `make clean` – Remove Python bytecode and __pycache__ folders
+- `make lint` – Check formatting and lint with Ruff (no changes)
+- `make format` – Auto-fix lint issues and format with Ruff
+- `make test` – Run the test suite with pytest
+
+Project workflows:
+- `make train-resnet18` – Fine-tune ResNet-18 on Food-101; tries local ImageFolder at `data/raw/food101`, falls back to Hugging Face dataset if not present
+- `make eval` – Run the unified evaluation script (`uv run src/eval/eval.py`) with MLflow tracking
+
+Documentation:
+- `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
+- `make docs-serve` – Serve docs locally at http://127.0.0.1:8000 with live reload
+- `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
+
+Typical first run on macOS (zsh):
+```bash
+# 1) Create and activate env
+make create_environment
+source .venv/bin/activate
+
+# 2) Install deps
+make requirements
+
+# 3) (Optional) Pull data with DVC – see steps above
+
+# 4) Verify setup
+make lint
+make test
+```
+
+Notes:
+- Run make targets from the project root.
+- Targets that call `python` (e.g., `make test`) expect your virtual environment to be activated.
+- Docs use MkDocs config at `docs/mkdocs.yml`.
+
 ## Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
