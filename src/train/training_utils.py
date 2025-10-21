@@ -8,9 +8,9 @@ metrics computation, and training execution.
 import os
 from typing import Dict, Tuple
 
+from codecarbon import EmissionsTracker
 import evaluate
 import numpy as np
-from codecarbon import EmissionsTracker
 from transformers import Trainer, TrainingArguments
 
 from src.train.config import TrainingParams
@@ -105,6 +105,6 @@ def save_trained_model(trainer: Trainer, params: TrainingParams) -> None:
     trainer.save_model(output_dir)
     trainer.tokenizer.save_pretrained(output_dir)
     
-    print(f"\nTo use this model:")
+    print("\nTo use this model:")
     print("  from src.models.resnet18 import Resnet18")
     print(f"  model = Resnet18.load_finetuned('{output_dir}')")

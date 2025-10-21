@@ -10,8 +10,8 @@ import io
 import os
 from typing import Optional, Tuple
 
-import pandas as pd
 from datasets import ClassLabel, Dataset, Features, Image
+import pandas as pd
 from PIL import Image as PILImage
 from transformers import AutoImageProcessor
 
