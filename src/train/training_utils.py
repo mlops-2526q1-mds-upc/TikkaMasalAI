@@ -63,7 +63,7 @@ def create_training_args(params: TrainingParams) -> TrainingArguments:
 
 
 def train_with_emissions_tracking(
-    trainer: Trainer, 
+    trainer: Trainer,
     params: TrainingParams,
     emissions_output_dir: str = "reports"
 ) -> None:

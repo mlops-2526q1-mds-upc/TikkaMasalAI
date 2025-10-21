@@ -71,7 +71,14 @@ Run a short fine-tuning job on Food-101:
 uv run -m src.train.finetune_resnet18 --epochs 2 --train_samples 1000 --eval_samples 200 --output_dir models/resnet18-food101-2e-1k
 ```
 
-- You can specify various parameters (see all available args in `src/train/finetune_resnet18.py`).
+You can also use configuration files (check `/configs`):
+```bash
+uv run -m src.train.finetune_resnet18 --config configs/training_quick.yaml
+
+# Override config parameters
+uv run -m src.train.finetune_resnet18 --config configs/training_quick.yaml --epochs 5
+```
+
 - To evaluate afterward:
 
 ```bash
