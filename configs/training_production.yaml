@@ -1,0 +1,28 @@
+# Production training configuration for full dataset training
+# Uses all available data with optimized settings
+
+data:
+  data_dir: "data/raw/food101/data"
+  train_samples: null  # Use all available training samples
+  eval_samples: null  # Use all available evaluation samples
+
+model:
+  model_name: "microsoft/resnet-18"
+  model_type: "resnet18"  # Used for naming and model selection
+  num_labels: null  # Will be inferred from dataset
+
+training:
+  epochs: 10
+  batch_size: 64
+  learning_rate: 0.0003
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  fp16: true  # Enable mixed precision for faster training
+  seed: 42
+
+output:
+  output_dir: null  # Will be auto-generated: "models/resnet18-food101-10e-lr3e-04"
+  base_output_dir: "models"
+  save_total_limit: 3
+  logging_steps: 100
+  report_to: "none"

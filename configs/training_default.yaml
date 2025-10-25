@@ -1,0 +1,28 @@
+# Default training configuration for Food-101
+# This is a minimal configuration that uses all default values
+
+data:
+  data_dir: "data/raw/food101/data"
+  train_samples: null  # Use all available training samples
+  eval_samples: null  # Use all available evaluation samples
+
+model:
+  model_name: "microsoft/resnet-18"
+  model_type: "resnet18"  # Used for naming and model selection
+  num_labels: null  # Will be inferred from dataset
+
+training:
+  epochs: 5
+  batch_size: 32
+  learning_rate: 0.0005
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  fp16: false
+  seed: 42
+
+output:
+  output_dir: null  # Will be auto-generated based on parameters
+  base_output_dir: "models"
+  save_total_limit: 2
+  logging_steps: 50
+  report_to: "none"
