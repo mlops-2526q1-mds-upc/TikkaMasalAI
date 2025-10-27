@@ -13,10 +13,10 @@ After training, the model can be loaded using:
 Usage:
     # Using command line arguments (original way)
     uv run -m src.train.finetune_resnet18 --epochs 3 --train_samples 10000 --eval_samples 2000
-    
+
     # Using configuration file
     uv run -m src.train.finetune_resnet18 --config configs/training_quick.yaml
-    
+
     # Override config parameters
     uv run -m src.train.finetune_resnet18 --config configs/training_quick.yaml --epochs 5
 """
@@ -43,33 +43,27 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Fine-tune ResNet-18 on Food-101 with configuration support"
     )
-    
+
     # Configuration file argument
     parser.add_argument(
         "--config",
         type=str,
         default=None,
-        help="Path to YAML configuration file (overrides other arguments)"
+        help="Path to YAML configuration file (overrides other arguments)",
     )
-    
+
     # Data arguments
     parser.add_argument(
         "--data_dir",
         type=str,
         default="data/raw/food101/data",
-        help="Path to directory with parquet files"
+        help="Path to directory with parquet files",
     )
     parser.add_argument(
-        "--train_samples", 
-        type=int, 
-        default=None, 
-        help="Number of training samples (None = all)"
+        "--train_samples", type=int, default=None, help="Number of training samples (None = all)"
     )
     parser.add_argument(
-        "--eval_samples", 
-        type=int, 
-        default=None, 
-        help="Number of eval samples (None = all)"
+        "--eval_samples", type=int, default=None, help="Number of eval samples (None = all)"
     )
 
     # Model arguments
@@ -91,7 +85,7 @@ def parse_args() -> argparse.Namespace:
 def create_params_from_args(args: argparse.Namespace) -> TrainingParams:
     """Create TrainingParams from command line arguments."""
     from src.train.config import DataConfig, ModelConfig, OutputConfig, TrainingConfig
-    
+
     return TrainingParams(
         data=DataConfig(
             data_dir=args.data_dir,
@@ -120,16 +114,16 @@ def create_params_from_args(args: argparse.Namespace) -> TrainingParams:
 def main() -> None:
     """Main training function."""
     args = parse_args()
-    
+
     # Load configuration
     if args.config:
         if not os.path.exists(args.config):
             print(f"Error: Configuration file not found: {args.config}")
             sys.exit(1)
-        
+
         print(f"Loading configuration from: {args.config}")
         params = load_config(args.config)
-        
+
         # Override with command line arguments if provided
         if args.epochs != 5:  # Check if non-default value provided
             params.training.epochs = args.epochs
@@ -142,7 +136,7 @@ def main() -> None:
     else:
         # Use command line arguments
         params = create_params_from_args(args)
-    
+
     # Print configuration
     print("Training Configuration:")
     print(f"  Model: {params.model.model_name}")
@@ -154,15 +148,15 @@ def main() -> None:
     print(f"  Learning rate: {params.training.learning_rate}")
     print(f"  Output dir: {params.get_output_dir()}")
     print()
-    
+
     # Set random seed
     set_seed(params.training.seed)
 
     # Load data
     raw_train, raw_eval = load_data(
-        params.data.data_dir, 
-        train_samples=params.data.train_samples, 
-        eval_samples=params.data.eval_samples
+        params.data.data_dir,
+        train_samples=params.data.train_samples,
+        eval_samples=params.data.eval_samples,
     )
     print("Data loading complete")
 
