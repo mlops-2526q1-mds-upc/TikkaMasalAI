@@ -1,15 +1,17 @@
 # src/api/deps.py
-import os
 from functools import lru_cache
 from importlib import import_module
+import os
 from typing import Protocol, Tuple
 
 from fastapi import HTTPException
+
 from src.models.food_classification_model import FoodClassificationModel
 
 
 class InferenceService(Protocol):
     model_name: str
+
     def predict(self, image_bytes: bytes) -> int: ...
 
 

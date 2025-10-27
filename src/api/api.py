@@ -1,13 +1,16 @@
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
 
-from src.api.schemas import PredictResponse, SampleItem
-from src.api.samples import list_sample_paths, DEFAULT_STATIC_DIR, DEFAULT_SAMPLES_DIR, get_samples_dir
 from src.api.deps import get_inference_service
+from src.api.samples import (
+    DEFAULT_SAMPLES_DIR,
+    DEFAULT_STATIC_DIR,
+    get_samples_dir,
+    list_sample_paths,
+)
+from src.api.schemas import PredictResponse, SampleItem
 from src.labels import index_to_label  # provided in your project context
-
 
 app = FastAPI(
     title="TikkaMasalAI Food-101 API",
@@ -29,7 +32,7 @@ def health():
 def root_ui():
     """
     Minimal UI so anyone can click a sample image and run inference without Postman.
-    If you want a fancier frontend later, you can replace this.
+    If you want a fancier frontend later.
     """
     samples = list_sample_paths(limit=10)
     if not samples:
@@ -57,7 +60,11 @@ def root_ui():
             if DEFAULT_SAMPLES_DIR.exists() and p.parent.resolve() == DEFAULT_SAMPLES_DIR.resolve()
             else ""  # no served image when using a custom external folder
         )
-        thumb = f'<img src="{img_url}" alt="{p.name}" style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:1px solid #eee;" />' if img_url else f"<code>{p.name}</code>"
+        thumb = (
+            f'<img src="{img_url}" alt="{p.name}" style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:1px solid #eee;" />'
+            if img_url
+            else f"<code>{p.name}</code>"
+        )
         cards.append(
             f"""
             <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:10px;border:1px solid #eee;border-radius:12px;">
@@ -68,7 +75,11 @@ def root_ui():
             """
         )
 
-    grid = "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;'>" + "".join(cards) + "</div>"
+    grid = (
+        "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;'>"
+        + "".join(cards)
+        + "</div>"
+    )
 
     return HTMLResponse(
         f"""
@@ -139,5 +150,5 @@ def predict_sample(
         predicted_index=idx,
         predicted_label=label,
         model_name=getattr(svc, "model_name", "unknown"),
-        bytes_read=len(image_bytes),
+        # bytes_read=len(image_bytes),
     )

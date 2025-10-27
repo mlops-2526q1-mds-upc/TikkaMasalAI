@@ -1,5 +1,6 @@
+from typing import Optional
+
 from pydantic import BaseModel
-from typing import List, Optional
 
 
 class SampleItem(BaseModel):
@@ -14,4 +15,4 @@ class PredictResponse(BaseModel):
     predicted_index: int
     predicted_label: str
     model_name: str
-    bytes_read: int
+    # bytes_read: int
