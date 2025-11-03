@@ -1,0 +1,24 @@
+meta {
+  name: llm/generate
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/llm/generate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "prompt": "What are the main ingredients in tikka masala? Keep it brief.",
+    "temperature": 0.7,
+    "max_tokens": 200
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.response: isNotEmpty
+}
