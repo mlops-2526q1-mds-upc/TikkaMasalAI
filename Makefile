@@ -6,110 +6,159 @@ PROJECT_NAME = Tikka MasalAI
 PYTHON_VERSION = 3.10
 PYTHON_INTERPRETER = python
 
+# Default target
+.DEFAULT_GOAL := help
+
+# Mark all targets as phony (order doesn't matter)
+.PHONY: help \
+	requirements create_environment clean lint format \
+	test test-backend code-coverage \
+	build-frontend-docker run-frontend-docker frontend-docker push-frontend-docker \
+	build-backend-docker run-backend-docker backend-docker push-backend-docker \
+	compose-up compose-down compose-logs \
+	local-up local-down local-logs \
+	test-local-api \
+	test-deployed-api \
+	train-resnet18 eval \
+	docs-build docs-serve docs
+
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
 
-
-## Install Python dependencies
-.PHONY: requirements
-requirements:
+requirements: ## Install Python dependencies
 	uv sync
-	
-## Delete all compiled Python files
-.PHONY: clean
-clean:
+
+create_environment: ## Set up Python interpreter environment
+	uv venv --python $(PYTHON_VERSION)
+	@echo ">>> New uv virtual environment created. Activate with:"
+	@echo ">>> Windows: .\\.venv\\Scripts\\activate"
+	@echo ">>> Unix/macOS: source ./.venv/bin/activate"
+
+clean: ## Delete all compiled Python files
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
-
-## Lint using ruff (use `make format` to do formatting)
-.PHONY: lint
-lint:
+lint: ## Lint using ruff (use `make format` to do formatting)
 	ruff format --check
 	ruff check
 
-## Format source code with ruff
-.PHONY: format
-format:
+format: ## Format source code with ruff
 	ruff check --fix
 	ruff format
 
-## Run tests
-.PHONY: test
-test:
-	python -m pytest tests
-
-
-## Set up Python interpreter environment
-.PHONY: create_environment
-create_environment:
-	uv venv --python $(PYTHON_VERSION)
-	@echo ">>> New uv virtual environment created. Activate with:"
-	@echo ">>> Windows: .\\\\.venv\\\\Scripts\\\\activate"
-	@echo ">>> Unix/macOS: source ./.venv/bin/activate"
-	
-
-
-
 #################################################################################
-# PROJECT RULES                                                                 #
+# TESTING AND CODE COVERAGE                                                     #
 #################################################################################
 
+test: ## Run tests
+	uv run pytest -q
 
-## Fine-tune ResNet-18 on Food-101 (local imagefolder or HF dataset)
-.PHONY: train-resnet18
-train-resnet18:
+test-backend: ## Test only the backend
+	uv run pytest -q tests/backend
+
+code-coverage: ## Open code coverage report
+	open reports/coverage/index.html
+
+#################################################################################
+# Docker Containers                                                             #
+#################################################################################
+
+build-frontend-docker: ## Build frontend docker container
+	docker build -f src/frontend/Dockerfile -t tikka-frontend .
+
+run-frontend-docker: ## Run frontend docker container
+	docker run --rm -p 8501:8501 tikka-frontend
+
+frontend-docker: build-frontend-docker run-frontend-docker ## Build and run frontend docker container
+
+push-frontend-docker: ## Push frontend docker container to GitHub Container Registry
+	docker build --platform=linux/arm64 -f src/frontend/Dockerfile -t ghcr.io/mlops-2526q1-mds-upc/tikka-frontend:latest --push .
+
+build-backend-docker: ## Build backend docker container
+	docker build -f src/backend/Dockerfile -t tikka-backend .
+
+run-backend-docker: ## Run backend docker container
+	docker run --rm -p 8000:8000 tikka-backend
+
+backend-docker: build-backend-docker run-backend-docker ## Build and run backend docker container
+
+push-backend-docker: ## Push backend docker container to GitHub Container Registry
+	docker build --platform=linux/arm64 -f src/backend/Dockerfile -t ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest --push .
+
+#################################################################################
+# Docker Compose                                                                #
+#################################################################################
+
+compose-up: ## Start stack (registry images)
+	docker compose -f docker-compose.yml up -d
+
+compose-down: ## Stop stack (registry images)
+	docker compose -f docker-compose.yml down
+
+compose-logs: ## Tail logs (registry images)
+	docker compose -f docker-compose.yml logs -f --tail=200
+
+local-up: ## Start local stack (build backend/frontend locally)
+	docker compose -f docker-compose-local.yml up --build
+
+local-down: ## Stop local stack
+	docker compose -f docker-compose-local.yml down
+
+local-logs: ## Tail logs for local stack
+	docker compose -f docker-compose-local.yml logs -f --tail=200
+
+#################################################################################
+# API Testing	                                                                #
+#################################################################################
+
+test-local-api: ## Run Bru tests against local API
+	cd tikkamasalai-requests && \
+	bru run --env-file environments/local.bru
+
+test-deployed-api: ## Run Bru tests against deployed API
+	cd tikkamasalai-requests && \
+	bru run --env-file environments/production.bru
+
+#################################################################################
+# MODEL TRAINING AND EVAL                                                       #
+#################################################################################
+
+train-resnet18: ## Fine-tune ResNet-18 on Food-101 (local imagefolder or HF dataset)
 	python src/train/finetune_resnet18.py --data_dir data/raw/food101 || \
 	python src/train/finetune_resnet18.py
 
-## Evaluate models using the unified evaluation script (MLflow tracking)
-.PHONY: eval
-eval:
+eval: ## Evaluate models using the unified evaluation script (MLflow tracking)
 	uv run src/eval/eval.py
 
-## Build the documentation site (MkDocs)
-.PHONY: docs-build
-docs-build:
+docs-build: ## Build the documentation site (MkDocs)
 	uv run mkdocs build --strict -f docs/mkdocs.yml
 
-## Serve documentation locally with live reload
-.PHONY: docs-serve
-docs-serve:
-	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8000
+#################################################################################
+# DOCUMENTATION                                                                 #
+#################################################################################
 
-.PHONY: docs
-docs:
+docs-serve: ## Serve documentation locally with live reload (uses 8001 to avoid backend conflict)
+	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8001
+
+docs: ## Build then serve docs locally (opens browser on 8001)
 	@echo "Building docs..."
 	$(MAKE) docs-build
 	@echo "Starting docs server..."
 	# Run the server in the background
-	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8000 & \
+	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8001 & \
 	SERVER_PID=$$!; \
 	sleep 1; \
 	if command -v open >/dev/null 2>&1; then \
-	  echo "Opening browser at http://127.0.0.1:8000"; \
-	  open http://127.0.0.1:8000; \
+	  echo "Opening browser at http://127.0.0.1:8001"; \
+	  open http://127.0.0.1:8001; \
 	fi; \
 	echo "Docs server running with PID $$SERVER_PID (press CTRL+C to stop)"; \
 	wait $$SERVER_PID
-
-
 
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
 
-.DEFAULT_GOAL := help
-
-define PRINT_HELP_PYSCRIPT
-import re, sys; \
-lines = '\n'.join([line for line in sys.stdin]); \
-matches = re.findall(r'\n## (.*)\n[\s\S]+?\n([a-zA-Z_-]+):', lines); \
-print('Available rules:\n'); \
-print('\n'.join(['{:25}{}'.format(*reversed(match)) for match in matches]))
-endef
-export PRINT_HELP_PYSCRIPT
-
-help:
-	@$(PYTHON_INTERPRETER) -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "%-25s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
