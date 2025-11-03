@@ -1,0 +1,61 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  backend:
+    image: adhagen/tikka-backend:latest
+    container_name: tikka-backend
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - APP_DEBUG=${APP_DEBUG:-false}
+    ports:
+      - "0.0.0.0:8000:8000"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request as u; sys.exit(0) if u.urlopen('http://127.0.0.1:8000/health', timeout=3).status==200 else sys.exit(1)"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  frontend:
+    image: adhagen/tikka-frontend:latest
+    container_name: tikka-frontend
+    ports:
+      - "0.0.0.0:8501:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: ollama-init
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-lc", "ollama pull gemma3:270m || true"]
+    restart: "no"
+
+volumes:
+  ollama_data:
+    driver: local
