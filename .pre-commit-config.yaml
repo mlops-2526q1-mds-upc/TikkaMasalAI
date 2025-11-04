@@ -3,4 +3,14 @@ repos:
     rev: v0.1.0
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["check", "--fix"]
+
+  - repo: local
+    hooks:
+      - id: docs-api-up-to-date
+        name: Advisory: API docs check (non-blocking)
+        language: system
+        entry: bash -c "make api-docs >/dev/null 2>&1 || true; if ! git diff --quiet -- docs/docs/api.html; then echo '[advisory] API docs changed. Run \"make api-docs\" and commit docs/docs/api.html.'; fi"
+        pass_filenames: false
+        stages: [pre-push]
+        files: ^src/backend/

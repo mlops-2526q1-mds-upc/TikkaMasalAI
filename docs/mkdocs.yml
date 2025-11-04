@@ -6,6 +6,8 @@ nav:
   - Contributing: contributing.md
   - Development:
       - Code Style: development/code_style.md
+      - Linting: development/ruff_ci.md
+  - API Documentation: api.html
 
 plugins:
   - include-markdown

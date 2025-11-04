@@ -41,12 +41,7 @@ uv run mlflow ui
 ```
 
 ## Contributing & PRs
-Follow the full developer guidance in `CONTRIBUTING.md`. Key pointers for agents interacting with contributors or preparing branches:
-
-- Branch and PR naming conventions, commit message guidance, and lint/test requirements are in `CONTRIBUTING.md`.
-- PR titles must use the emoji prefixes defined in `CONTRIBUTING.md` (e.g., ✨ feat:, 🐛 fix:, 📝 docs:). Agents should enforce or suggest these when preparing PRs for humans.
-- Before opening a PR, ensure formatting and linting: `make format` (or `ruff check --fix && ruff format`) and run the test suite: `uv run pytest -q`.
-- For detailed naming, docstring, typing, and import rules consult `docs/development/code_style.md` (single source of truth). Do not duplicate rules here.
+Follow the full developer guidance in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Package Management (short)
 - Add packages: `uv add <package>`

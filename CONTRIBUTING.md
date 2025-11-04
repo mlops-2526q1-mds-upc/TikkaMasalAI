@@ -144,9 +144,18 @@ Update or add:
 - `docs/` pages if user workflows change
 - Inline docstrings for public classes/functions
 
+### Backend API docs (OpenAPI/Redoc)
+- When you change backend endpoints or request/response models, regenerate the API docs.
+- Prerequisites: Node.js ≥ 20 (for Redoc CLI).
+- Commands:
+	- `make api-docs` to refresh `src/backend/openapi.json` and `docs/docs/api.html`.
+	- `make docs-build` to validate the docs site builds.
+- CI will fail if `docs/docs/api.html` is stale; commit regenerated files.
+
 ## CI Pipeline
 GitHub Actions workflows:
 - `ruff.yml` – lint on every push + PR
+- `docs.yml` – builds backend API docs and MkDocs; fails if `docs/docs/api.html` is out of date.
 Future additions may include: tests, build, deployment. PRs should keep lint green.
 
 ## Dependency Management
