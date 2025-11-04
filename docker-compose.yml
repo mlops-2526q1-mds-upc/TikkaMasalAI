@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: adhagen/tikka-backend:latest
+    image: ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest
     container_name: tikka-backend
     environment:
       - OLLAMA_HOST=http://ollama:11434
@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: adhagen/tikka-frontend:latest
+    image: ghcr.io/mlops-2526q1-mds-upc/tikka-frontend:latest
     container_name: tikka-frontend
     ports:
       - "0.0.0.0:8501:8501"

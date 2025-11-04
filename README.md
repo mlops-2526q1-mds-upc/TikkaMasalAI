@@ -51,6 +51,10 @@ Documentation:
 - `make docs-serve` – Serve docs locally at http://127.0.0.1:8000 with live reload
 - `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
 
+Containerization and deployment:
+- Docker & Compose usage: see docs/docs/development/containers.md
+- Deployment strategy (images, tags, registry, rollout): see docs/docs/development/deployment.md
+
 Typical first run on macOS (zsh):
 ```bash
 # 1) Create and activate env

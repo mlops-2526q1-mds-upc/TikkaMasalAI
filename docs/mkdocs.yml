@@ -7,7 +7,11 @@ nav:
   - Development:
       - Code Style: development/code_style.md
       - Linting: development/ruff_ci.md
+      - Containers & Compose: development/containers.md
+      - Deployment: development/deployment.md
+      - Testing: development/testing.md
   - API Documentation: api.html
 
 plugins:
   - include-markdown
+  - mermaid2
