@@ -76,9 +76,7 @@ def load_model(model_name: str, model_path: str | None = None):
         return "vgg16", VGG16()
     if name in {"prithiv", "prithivml", "prithivml_food101", "food101", "food-101"}:
         return "prithiv_ml_food101", PrithivMlFood101()
-    raise ValueError(
-        "Unsupported model name. Use one of: resnet18, vgg16, prithiv"
-    )
+    raise ValueError("Unsupported model name. Use one of: resnet18, vgg16, prithiv")
 
 
 def make_predict_fn(model_key: str, model_obj) -> Callable[[Sequence[PILImage.Image]], np.ndarray]:
@@ -166,11 +164,13 @@ def run_shap_qa(
 
     # Separate background and eval sets
     background_images = [img for img, _ in samples[:background_k]]
-    eval_images = [img for img, _ in samples[background_k:background_k + eval_n]]
+    eval_images = [img for img, _ in samples[background_k : background_k + eval_n]]
 
     # Normalize image sizes to a fixed resolution expected by SHAP and models
     target_size = (224, 224)
-    background_images = [img.resize(target_size, resample=PILImage.BILINEAR) for img in background_images]
+    background_images = [
+        img.resize(target_size, resample=PILImage.BILINEAR) for img in background_images
+    ]
     eval_images = [img.resize(target_size, resample=PILImage.BILINEAR) for img in eval_images]
 
     predict_fn = make_predict_fn(model_key, model)
@@ -206,7 +206,7 @@ def run_shap_qa(
         num_to_plot = min(4, len(eval_np))
         for i in range(num_to_plot):
             plt.figure(figsize=(5, 5))
-            shap.image_plot(shap_values[i:i+1], eval_np[i:i+1], show=False)
+            shap.image_plot(shap_values[i : i + 1], eval_np[i : i + 1], show=False)
             plt.tight_layout()
             plt.savefig(figs_dir / f"image_{i}_overlay.png", dpi=150)
             plt.close()
@@ -255,7 +255,12 @@ def main() -> None:
     parser.add_argument("--background-k", type=int, default=24)
     parser.add_argument("--eval-n", type=int, default=16)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--model-path", type=str, default=None, help="Optional path or HF id for model weights (used for Resnet18)")
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=None,
+        help="Optional path or HF id for model weights (used for Resnet18)",
+    )
     args = parser.parse_args()
 
     run_shap_qa(

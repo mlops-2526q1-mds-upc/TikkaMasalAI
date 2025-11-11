@@ -27,13 +27,13 @@ def build_model(
 ) -> AutoModelForImageClassification:
     """
     Load and configure model for fine-tuning.
-    
+
     Args:
         model_name: HuggingFace model name or path
         num_labels: Number of output classes
         id2label: Mapping from class index to label name
         label2id: Mapping from label name to class index
-        
+
     Returns:
         Configured model ready for fine-tuning
     """

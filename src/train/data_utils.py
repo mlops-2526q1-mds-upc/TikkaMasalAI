@@ -28,10 +28,10 @@ def load_data(
         data_dir: Path to directory containing train-*.parquet and validation-*.parquet files
         train_samples: Number of training samples to use (None = all)
         eval_samples: Number of eval samples to use (None = all)
-        
+
     Returns:
         Tuple of (train_dataset, eval_dataset)
-        
+
     Raises:
         ValueError: If no parquet files found in data_dir
     """
@@ -104,6 +104,7 @@ def prepare_datasets(
     Returns:
         Tuple of (processed_train_dataset, processed_eval_dataset)
     """
+
     def train_transform(examples: dict[str, any]) -> dict[str, any]:
         """Transform function for training data."""
         images = [img.convert("RGB") for img in examples["image"]]
