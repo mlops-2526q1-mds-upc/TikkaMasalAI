@@ -1,0 +1,17 @@
+meta {
+  name: llm/health
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/llm/health
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq healthy
+  res.body.ollama_url: eq http://ollama:11434
+}

@@ -1,0 +1,25 @@
+meta {
+  name: predict
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/predict
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  image: @file(../res/guacamole.jpeg)
+}
+
+assert {
+  res.status: eq 200
+  res.body.predictions: isNotEmpty
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,41 @@
+meta {
+  name: predict/explain
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/predict/explain
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(../res/guacamole.jpeg)
+}
+
+assert {
+  res.status: eq 200
+  res.body.predicted_class: isNotEmpty
+  res.body.attention_map: isNotEmpty
+}
+
+docs {
+  # Explainability Endpoint
+  
+  This endpoint generates an attention-based visualization showing which parts of the image the model focuses on when making predictions.
+  
+  ## Response
+  - `predicted_class`: The predicted food type
+  - `confidence`: Model's confidence score (0-1)
+  - `attention_map`: Base64-encoded PNG image with attention heatmap overlay
+  - `num_layers`: Number of transformer layers
+  - `num_heads`: Number of attention heads per layer
+  - `grid_size`: Dimensions of the attention grid
+  - `filename`: Original uploaded filename
+  
+  ## Usage
+  The `attention_map` field contains a base64-encoded PNG image that can be:
+  1. Decoded and saved as a file
+  2. Displayed directly in HTML using: `<img src="data:image/png;base64,{attention_map}" />`
+}
