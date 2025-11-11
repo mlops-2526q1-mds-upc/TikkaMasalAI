@@ -6,6 +6,9 @@
 
 An MLOps project for food classification using computer vision techniques.
 
+## Demo Video
+[![Project Demo](res/thumbnail.jpeg)](https://www.youtube.com/watch?v=jNQXAC9IVRw)
+
 ## Setup
 ### uv
 1. This project uses uv for Python dependency management. You can install it [here](https://docs.astral.sh/uv/getting-started/installation/).
