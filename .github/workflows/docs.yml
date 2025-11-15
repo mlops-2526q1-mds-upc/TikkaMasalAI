@@ -21,8 +21,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install project deps
-        run: uv sync
+      - name: Install project deps (only backend)
+        run: uv sync --only-group backend
 
       - name: Generate backend API docs
         run: make api-docs
