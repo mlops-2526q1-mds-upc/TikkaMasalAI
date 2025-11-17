@@ -131,13 +131,13 @@ def main() -> None:
         st.info("Prediction received, but no obvious label was found in the response.")
 
     # Tabs for next steps
-    tab1, tab2, tab3 = st.tabs(["Get Recipe", "Explain Prediction", "Raw JSON"])
+    tab1, tab2, tab3 = st.tabs(["Dish Information", "Explain Prediction", "Raw JSON"])
 
     # Tab 1: Get Recipe (LLM)
     with tab1:
         st.subheader("Information About the Dish")
-        recipe_question = f"How do I prepare {primary_label}? Provide ingredients and clear step-by-step cooking instructions."
-        nutrient_value_question = f"What are the nutrient values of {primary_label}? Provide information for an amount in which it is typically consumed."
+        recipe_question = f"How do I prepare {primary_label}? Provide ingredients and clear step-by-step cooking instructions. Be concise."
+        nutrient_value_question = f"What are the nutritional values of {primary_label}? Provide information for an amount in which it is typically consumed."
         inventor_question = f"In which nation was {primary_label} invented? If you can, provide further information like who invented it or when it was invented."
 
         options = {
@@ -187,7 +187,7 @@ def main() -> None:
                     st.session_state["tikka_llm_response"] = llm_response_json
                     llm_text = extract_llm_text(llm_response_json)
                     if llm_text:
-                        st.subheader("Suggested recipe")
+                        st.subheader(choice)
                         st.markdown(llm_text)
                     else:
                         st.info("Received an LLM response, but couldn't find any text to display.")

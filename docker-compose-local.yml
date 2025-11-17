@@ -24,11 +24,21 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - APP_DEBUG=${APP_DEBUG:-false}
+    # Mount local code for hot-reload
+    volumes:
+      - ./src:/app/src
+      - ./models:/app/models
     ports:
       - "0.0.0.0:8000:8000"
     depends_on:
       ollama:
         condition: service_healthy
+    # Override command to enable uvicorn reload in local dev
+    command: [
+      "uv", "run", "uvicorn", "src.backend.app:app",
+      "--host", "0.0.0.0", "--port", "8000",
+      "--reload", "--reload-dir", "src"
+    ]
     healthcheck:
       test: ["CMD", "python", "-c", "import sys,urllib.request as u; sys.exit(0) if u.urlopen('http://127.0.0.1:8000/health', timeout=3).status==200 else sys.exit(1)"]
       start_period: 10s
@@ -42,8 +52,16 @@ services:
       context: .
       dockerfile: src/frontend/Dockerfile
     container_name: tikka-frontend
-    command: ["uv", "run", "streamlit", "run", "app/frontend/main.py"]
+    # Enable Streamlit live reload and mount local code
+    command: [
+      "uv", "run", "streamlit", "run", "app/frontend/main.py",
+      "--server.address=0.0.0.0",
+      "--server.port=8501",
+      "--server.runOnSave=true",
+      "--server.fileWatcherType=auto"
+    ]
     volumes:
+      - ./src/frontend:/app/app/frontend
       - ./src/frontend/.streamlit/secrets.toml:/app/.streamlit/secrets.toml:ro
     ports:
       - "0.0.0.0:8501:8501"
