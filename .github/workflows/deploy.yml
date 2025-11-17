@@ -29,13 +29,21 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ${{ env.IMAGE_PREFIX }}/tikka-backend:latest -f src/backend/Dockerfile .
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          docker build -t ${{ env.IMAGE_PREFIX }}/tikka-backend:latest \
+                      -t ${{ env.IMAGE_PREFIX }}/tikka-backend:$SHORT_SHA \
+                      -f src/backend/Dockerfile .
           docker push ${{ env.IMAGE_PREFIX }}/tikka-backend:latest
+          docker push ${{ env.IMAGE_PREFIX }}/tikka-backend:$SHORT_SHA
 
       - name: Build and push frontend image
         run: |
-          docker build -t ${{ env.IMAGE_PREFIX }}/tikka-frontend:latest -f src/frontend/Dockerfile .
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          docker build -t ${{ env.IMAGE_PREFIX }}/tikka-frontend:latest \
+                      -t ${{ env.IMAGE_PREFIX }}/tikka-frontend:$SHORT_SHA \
+                      -f src/frontend/Dockerfile .
           docker push ${{ env.IMAGE_PREFIX }}/tikka-frontend:latest
+          docker push ${{ env.IMAGE_PREFIX }}/tikka-frontend:$SHORT_SHA
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,7 +57,5 @@ jobs:
           username: ${{ secrets.GCP_VM_USER }}
           key: ${{ secrets.GCP_VM_SSH_KEY }}
           script: |
-            cd /home/adrian_mwh100/tikkamasalai
-            docker compose pull backend frontend
-            docker compose up -d
-            docker system prune -f
+            cd /home/adrian_mwh100
+            ./run.sh
