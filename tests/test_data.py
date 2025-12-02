@@ -4,6 +4,13 @@ import pytest
 
 from src.data.download_data import snapshot_download
 
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Data download/check tests are run locally only (CI has no dataset).",
+)
+
+
+
 
 @pytest.fixture
 def data_dir():

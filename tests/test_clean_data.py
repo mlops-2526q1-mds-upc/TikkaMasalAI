@@ -6,6 +6,11 @@ from loguru import logger
 import pandas as pd
 import pytest
 
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Deepchecks data validation tests are run locally only (CI has no dataset).",
+)
+
 
 @pytest.fixture
 def clean_data_dir():
