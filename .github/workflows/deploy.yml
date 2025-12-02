@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - gcs-model-storage
 
 env:
   REGISTRY: ghcr.io
