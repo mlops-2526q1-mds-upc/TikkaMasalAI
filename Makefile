@@ -84,7 +84,12 @@ run-backend-docker: ## Run backend docker container
 backend-docker: build-backend-docker run-backend-docker ## Build and run backend docker container
 
 push-backend-docker: ## Push backend docker container to GitHub Container Registry
-	docker build --platform=linux/arm64 -f src/backend/Dockerfile -t ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest --push .
+	docker build --platform=linux/arm64 \
+		--secret id=gcp_credentials,src=$(HOME)/.config/gcloud/application_default_credentials.json \
+		--build-arg GOOGLE_CLOUD_PROJECT=academic-torch-476716-h3 \
+		-f src/backend/Dockerfile \
+		-t ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest \
+		--push .
 
 #################################################################################
 # Docker Compose                                                                #

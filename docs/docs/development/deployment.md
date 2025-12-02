@@ -19,6 +19,50 @@ This project deploys as a small stack of containers: ollama, backend (FastAPI), 
     - make push-backend-docker
     - make push-frontend-docker
 
+## Model Storage with Google Cloud Storage
+
+The backend Docker image downloads models from Google Cloud Storage (GCS) during the build process. This ensures models are baked into the image for easy distribution.
+
+#### Building Backend with Models
+
+**Prerequisites:**
+1. Authenticate with GCP: `gcloud auth application-default login`
+2. GitHub Personal Access Token with `write:packages` scope for pushing to GHCR
+
+**Build and push backend image:**
+```bash
+# Build with models from GCS
+docker build -t ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest \
+  --build-arg GOOGLE_CLOUD_PROJECT=academic-torch-476716-h3 \
+  --secret id=gcp_credentials,src=$HOME/.config/gcloud/application_default_credentials.json \
+  -f src/backend/Dockerfile .
+
+# Login to GHCR
+echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+
+# Push to registry
+docker push ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest
+```
+
+**Notes:**
+- GCP credentials are used only during build and are NOT stored in the image
+- Models are downloaded from `gs://tikkamasalai-models` bucket
+- The pushed image contains models but no credentials
+- Teammates can pull the image without GCP access
+
+#### For Team Members
+
+**To pull and use the pre-built image (no GCP needed):**
+```bash
+docker pull ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest
+docker compose up -d
+```
+
+**To build the image yourself (requires GCP access):**
+1. Get GCP credentials from team lead
+2. Run `gcloud auth application-default login`
+3. Follow build steps above
+
 ## Environments
 - Development: docker-compose-local.yml builds images locally and mounts secrets for the frontend.
 - Staging/Production: docker-compose.yml uses prebuilt images from GHCR. 
