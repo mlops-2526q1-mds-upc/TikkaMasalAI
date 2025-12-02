@@ -5,6 +5,23 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/metrics": {
+      "get": {
+        "summary": "Metrics",
+        "description": "Endpoint that serves Prometheus metrics.",
+        "operationId": "metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "tags": [
@@ -154,6 +171,25 @@
                   "additionalProperties": true,
                   "type": "object",
                   "title": "Response Check Ollama Health Llm Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "summary": "Metrics Dashboard",
+        "description": "Enhanced visual dashboard for Prometheus metrics with charts.\nIncludes Chart.js for visualizations.",
+        "operationId": "metrics_dashboard_dashboard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
