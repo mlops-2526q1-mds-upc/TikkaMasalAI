@@ -1,7 +1,13 @@
 import io
+import os
 
 from PIL import Image
 import pytest
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Model integration tests are run locally only (CI avoids heavy model downloads).",
+)
 
 from src.models.prithiv_ml_food101 import PrithivMlFood101
 from src.models.resnet18 import Resnet18

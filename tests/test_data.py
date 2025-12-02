@@ -2,6 +2,11 @@ import os
 
 import pytest
 
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Data download/check tests are run locally only (CI has no dataset).",
+)
+
 from src.data.download_data import snapshot_download
 
 
