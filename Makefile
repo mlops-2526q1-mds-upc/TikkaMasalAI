@@ -142,7 +142,7 @@ eval: ## Evaluate models using the unified evaluation script (MLflow tracking)
 
 api-docs: ## Build the api documentation. Make sure to have node.js installed (https://nodejs.org/en/download).
 	uv run src/backend/export_schema.py
-	npx @redocly/cli build-docs src/backend/openapi.json -o docs/docs/api.html
+	npx --yes @redocly/cli build-docs src/backend/openapi.json -o docs/docs/api.html
 
 docs-build: ## Build the documentation site (MkDocs)
 	$(MAKE) api-docs
