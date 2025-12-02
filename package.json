@@ -1,0 +1,9 @@
+{
+  "name": "tikkamasalai",
+  "version": "1.0.0",
+  "description": "MLOps project for food classification",
+  "private": true,
+  "devDependencies": {
+    "@redocly/cli": "^1.25.13"
+  }
+}
