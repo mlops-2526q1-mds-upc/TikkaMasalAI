@@ -19,10 +19,10 @@ from src.train.config import TrainingParams
 def compute_metrics_fn(eval_pred: Tuple[np.ndarray, np.ndarray]) -> Dict[str, float]:
     """
     Compute accuracy metrics for evaluation.
-    
+
     Args:
         eval_pred: Tuple of (predictions, labels)
-        
+
     Returns:
         Dictionary containing computed metrics
     """
@@ -35,10 +35,10 @@ def compute_metrics_fn(eval_pred: Tuple[np.ndarray, np.ndarray]) -> Dict[str, fl
 def create_training_args(params: TrainingParams) -> TrainingArguments:
     """
     Create TrainingArguments from configuration parameters.
-    
+
     Args:
         params: Training parameters configuration
-        
+
     Returns:
         Configured TrainingArguments object
     """
@@ -63,13 +63,11 @@ def create_training_args(params: TrainingParams) -> TrainingArguments:
 
 
 def train_with_emissions_tracking(
-    trainer: Trainer,
-    params: TrainingParams,
-    emissions_output_dir: str = "reports"
+    trainer: Trainer, params: TrainingParams, emissions_output_dir: str = "reports"
 ) -> None:
     """
     Train model with emissions tracking.
-    
+
     Args:
         trainer: Configured trainer object
         params: Training parameters
@@ -78,33 +76,33 @@ def train_with_emissions_tracking(
     print("Starting training...")
     tracker = EmissionsTracker(output_dir=emissions_output_dir)
     tracker.start()
-    
+
     try:
         trainer.train()
     finally:
         tracker.stop()
-    
+
     print("Training complete!")
 
 
 def save_trained_model(trainer: Trainer, params: TrainingParams) -> None:
     """
     Save the trained model and processor.
-    
+
     Args:
         trainer: Trained trainer object
         params: Training parameters
     """
     output_dir = params.get_output_dir()
     print(f"Saving model to {output_dir}")
-    
+
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
-    
+
     # Save model and processor
     trainer.save_model(output_dir)
     trainer.tokenizer.save_pretrained(output_dir)
-    
+
     print("\nTo use this model:")
     print("  from src.models.resnet18 import Resnet18")
     print(f"  model = Resnet18.load_finetuned('{output_dir}')")
