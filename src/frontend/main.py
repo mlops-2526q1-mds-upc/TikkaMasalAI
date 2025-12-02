@@ -221,7 +221,6 @@ def main() -> None:
                     st.markdown(f"{pct:.1f}%")
 
         st.markdown("**Visualize attention from the model**")
-        heatmap_opacity = st.slider("Heatmap opacity", 0.1, 0.9, 0.5, 0.05, key="opacity_slider")
         do_explain = st.button("Generate Heatmap")
 
         if do_explain:
@@ -283,7 +282,7 @@ def main() -> None:
                     elif heatmap_arr is not None:
                         try:
                             blended = overlay_heatmap_on_image(
-                                image, heatmap_arr, opacity=heatmap_opacity
+                                image, heatmap_arr, opacity=0.5
                             )
                             st.image(
                                 blended,
