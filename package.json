@@ -4,6 +4,6 @@
   "description": "MLOps project for food classification",
   "private": true,
   "devDependencies": {
-    "@redocly/cli": "^1.25.13"
+    "@redocly/cli": "1.34.5"
   }
 }
