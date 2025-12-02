@@ -20,6 +20,10 @@ services:
     build:
       context: .
       dockerfile: src/backend/Dockerfile
+      args:
+        - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-academic-torch-476716-h3}
+      secrets:
+        - gcp_credentials
     container_name: tikka-backend
     environment:
       - OLLAMA_HOST=http://ollama:11434
@@ -84,3 +88,7 @@ services:
 volumes:
   ollama_data:
     driver: local
+
+secrets:
+  gcp_credentials:
+    file: ${GOOGLE_APPLICATION_CREDENTIALS:-~/.config/gcloud/application_default_credentials.json}
