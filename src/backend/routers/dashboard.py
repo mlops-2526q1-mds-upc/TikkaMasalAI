@@ -1,19 +1,17 @@
 """
-Simple metrics dashboard for Prometheus metrics.
+Enhanced metrics dashboard for FastAPI with charts.
 """
 
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
-from prometheus_client import REGISTRY
-import json
 
 router = APIRouter()
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def metrics_dashboard():
     """
-    Simple visual dashboard for Prometheus metrics.
-    No external dependencies - just HTML + JavaScript.
+    Enhanced visual dashboard for Prometheus metrics with charts.
+    Includes Chart.js for visualizations.
     """
     
     html_content = """
@@ -23,6 +21,7 @@ async def metrics_dashboard():
         <title>Tikka MasalAI - Metrics Dashboard</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <style>
             * {
                 margin: 0;
@@ -38,7 +37,7 @@ async def metrics_dashboard():
             }
             
             .container {
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
             }
             
@@ -52,7 +51,7 @@ async def metrics_dashboard():
             
             .metrics-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                 gap: 20px;
                 margin-bottom: 20px;
             }
@@ -76,6 +75,7 @@ async def metrics_dashboard():
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 margin-bottom: 10px;
+                font-weight: 600;
             }
             
             .metric-value {
@@ -88,6 +88,31 @@ async def metrics_dashboard():
             .metric-subtitle {
                 font-size: 12px;
                 color: #999;
+            }
+            
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .chart-card {
+                background: white;
+                border-radius: 10px;
+                padding: 25px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            
+            .chart-card h2 {
+                color: #333;
+                margin-bottom: 20px;
+                font-size: 1.3em;
+            }
+            
+            .chart-container {
+                position: relative;
+                height: 300px;
             }
             
             .table-card {
@@ -113,6 +138,7 @@ async def metrics_dashboard():
                 padding: 12px;
                 text-align: left;
                 border-bottom: 1px solid #eee;
+                color: #333;  /* Fixed: Added black color */
             }
             
             th {
@@ -122,6 +148,11 @@ async def metrics_dashboard():
                 font-size: 12px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+            }
+            
+            td {
+                color: #1a1a1a;  /* Fixed: Darker color for better visibility */
+                font-size: 14px;
             }
             
             tr:hover {
@@ -146,6 +177,11 @@ async def metrics_dashboard():
                 color: #856404;
             }
             
+            .status-error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
             .refresh-info {
                 text-align: center;
                 color: white;
@@ -158,6 +194,20 @@ async def metrics_dashboard():
                 color: white;
                 font-size: 18px;
                 padding: 50px;
+            }
+            
+            .timestamp {
+                text-align: center;
+                color: white;
+                margin-top: 10px;
+                font-size: 12px;
+                opacity: 0.8;
+            }
+            
+            @media (max-width: 768px) {
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
             }
         </style>
     </head>
@@ -172,9 +222,14 @@ async def metrics_dashboard():
             <div class="refresh-info">
                 Auto-refreshing every 10 seconds
             </div>
+            <div class="timestamp" id="last-update"></div>
         </div>
         
         <script>
+            let requestsChart = null;
+            let latencyChart = null;
+            let statusChart = null;
+            
             async function fetchMetrics() {
                 try {
                     const response = await fetch('/metrics');
@@ -240,13 +295,74 @@ async def metrics_dashboard():
                         const status = statusMatch ? statusMatch[1] : 'unknown';
                         
                         if (!endpointMap[key]) {
-                            endpointMap[key] = { endpoint: key, requests: 0, status: status };
+                            endpointMap[key] = { 
+                                endpoint: key, 
+                                method: methodMatch[1],
+                                path: handlerMatch[1],
+                                requests: 0, 
+                                status: status 
+                            };
                         }
                         endpointMap[key].requests += metric.value;
                     }
                 }
                 
                 return Object.values(endpointMap).sort((a, b) => b.requests - a.requests);
+            }
+            
+            function getStatusCodeDistribution(metrics) {
+                const distribution = { '2xx': 0, '3xx': 0, '4xx': 0, '5xx': 0 };
+                
+                if (!metrics.http_requests_total) return distribution;
+                
+                for (const metric of metrics.http_requests_total) {
+                    const statusMatch = metric.labels.match(/status="([^"]+)"/);
+                    if (statusMatch) {
+                        const status = statusMatch[1];
+                        if (distribution[status] !== undefined) {
+                            distribution[status] += metric.value;
+                        }
+                    }
+                }
+                
+                return distribution;
+            }
+            
+            function getLatencyByEndpoint(metrics) {
+                if (!metrics.http_request_duration_seconds_sum || !metrics.http_request_duration_seconds_count) {
+                    return [];
+                }
+                
+                const latencyMap = {};
+                
+                // Sum durations by handler
+                for (const metric of metrics.http_request_duration_seconds_sum) {
+                    const handlerMatch = metric.labels.match(/handler="([^"]+)"/);
+                    if (handlerMatch) {
+                        const handler = handlerMatch[1];
+                        if (!latencyMap[handler]) {
+                            latencyMap[handler] = { sum: 0, count: 0 };
+                        }
+                        latencyMap[handler].sum += metric.value;
+                    }
+                }
+                
+                // Count requests by handler
+                for (const metric of metrics.http_request_duration_seconds_count) {
+                    const handlerMatch = metric.labels.match(/handler="([^"]+)"/);
+                    if (handlerMatch) {
+                        const handler = handlerMatch[1];
+                        if (latencyMap[handler]) {
+                            latencyMap[handler].count += metric.value;
+                        }
+                    }
+                }
+                
+                // Calculate averages
+                return Object.entries(latencyMap).map(([handler, data]) => ({
+                    endpoint: handler,
+                    avgLatency: data.count > 0 ? (data.sum / data.count * 1000).toFixed(2) : 0
+                })).sort((a, b) => b.avgLatency - a.avgLatency);
             }
             
             function getPythonVersion(metrics) {
@@ -264,6 +380,159 @@ async def metrics_dashboard():
                 return 'Unknown';
             }
             
+            function createRequestsChart(endpoints) {
+                const ctx = document.getElementById('requestsChart');
+                if (!ctx) return;
+                
+                // Destroy existing chart
+                if (requestsChart) {
+                    requestsChart.destroy();
+                }
+                
+                const labels = endpoints.map(ep => ep.path);
+                const data = endpoints.map(ep => ep.requests);
+                
+                requestsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Requests',
+                            data: data,
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(237, 100, 166, 0.8)',
+                                'rgba(255, 154, 158, 0.8)',
+                                'rgba(250, 208, 196, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(102, 126, 234, 1)',
+                                'rgba(118, 75, 162, 1)',
+                                'rgba(237, 100, 166, 1)',
+                                'rgba(255, 154, 158, 1)',
+                                'rgba(250, 208, 196, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function createLatencyChart(latencyData) {
+                const ctx = document.getElementById('latencyChart');
+                if (!ctx) return;
+                
+                // Destroy existing chart
+                if (latencyChart) {
+                    latencyChart.destroy();
+                }
+                
+                const labels = latencyData.map(item => item.endpoint);
+                const data = latencyData.map(item => parseFloat(item.avgLatency));
+                
+                latencyChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Avg Latency (ms)',
+                            data: data,
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: 'rgba(102, 126, 234, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Milliseconds'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function createStatusChart(statusDistribution) {
+                const ctx = document.getElementById('statusChart');
+                if (!ctx) return;
+                
+                // Destroy existing chart
+                if (statusChart) {
+                    statusChart.destroy();
+                }
+                
+                const labels = Object.keys(statusDistribution);
+                const data = Object.values(statusDistribution);
+                
+                statusChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                'rgba(40, 167, 69, 0.8)',   // 2xx - green
+                                'rgba(23, 162, 184, 0.8)',  // 3xx - cyan
+                                'rgba(255, 193, 7, 0.8)',   // 4xx - yellow
+                                'rgba(220, 53, 69, 0.8)'    // 5xx - red
+                            ],
+                            borderColor: [
+                                'rgba(40, 167, 69, 1)',
+                                'rgba(23, 162, 184, 1)',
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(220, 53, 69, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+            
             function renderDashboard(metrics) {
                 if (!metrics) {
                     document.getElementById('dashboard-content').innerHTML = 
@@ -275,6 +544,8 @@ async def metrics_dashboard():
                 const avgLatency = calculateAverageLatency(metrics);
                 const pythonVersion = getPythonVersion(metrics);
                 const endpoints = getRequestsByEndpoint(metrics);
+                const latencyData = getLatencyByEndpoint(metrics);
+                const statusDistribution = getStatusCodeDistribution(metrics);
                 
                 const html = `
                     <div class="metrics-grid">
@@ -291,17 +562,47 @@ async def metrics_dashboard():
                         </div>
                         
                         <div class="metric-card">
+                            <div class="metric-title">Active Endpoints</div>
+                            <div class="metric-value">${endpoints.length}</div>
+                            <div class="metric-subtitle">Serving requests</div>
+                        </div>
+                        
+                        <div class="metric-card">
                             <div class="metric-title">Python Version</div>
                             <div class="metric-value" style="font-size: 28px;">${pythonVersion}</div>
                             <div class="metric-subtitle">CPython</div>
                         </div>
                     </div>
                     
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h2>📊 Requests by Endpoint</h2>
+                            <div class="chart-container">
+                                <canvas id="requestsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h2>⚡ Average Latency</h2>
+                            <div class="chart-container">
+                                <canvas id="latencyChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h2>✅ Status Code Distribution</h2>
+                            <div class="chart-container">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="table-card">
-                        <h2>📊 Requests by Endpoint</h2>
+                        <h2>📋 Detailed Endpoint Statistics</h2>
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Method</th>
                                     <th>Endpoint</th>
                                     <th>Requests</th>
                                     <th>Status</th>
@@ -310,9 +611,14 @@ async def metrics_dashboard():
                             <tbody>
                                 ${endpoints.map(ep => `
                                     <tr>
-                                        <td><strong>${ep.endpoint}</strong></td>
+                                        <td><strong>${ep.method}</strong></td>
+                                        <td>${ep.path}</td>
                                         <td>${ep.requests}</td>
-                                        <td><span class="status-badge ${ep.status.startsWith('2') ? 'status-success' : 'status-warning'}">${ep.status}</span></td>
+                                        <td><span class="status-badge ${
+                                            ep.status.startsWith('2') ? 'status-success' : 
+                                            ep.status.startsWith('4') ? 'status-warning' : 
+                                            'status-error'
+                                        }">${ep.status}</span></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -321,6 +627,18 @@ async def metrics_dashboard():
                 `;
                 
                 document.getElementById('dashboard-content').innerHTML = html;
+                
+                // Create charts after DOM is updated
+                setTimeout(() => {
+                    createRequestsChart(endpoints);
+                    createLatencyChart(latencyData);
+                    createStatusChart(statusDistribution);
+                }, 100);
+                
+                // Update timestamp
+                const now = new Date();
+                document.getElementById('last-update').textContent = 
+                    `Last updated: ${now.toLocaleTimeString()}`;
             }
             
             async function updateDashboard() {
