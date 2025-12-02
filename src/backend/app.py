@@ -3,8 +3,10 @@ import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from src.backend.routers import llm, predict
+from src.backend.routers.dashboard import router as dashboard_router
 
 # Debug toggle via env var
 APP_DEBUG = os.getenv("APP_DEBUG", "false").lower() in {"1", "true", "yes", "on"}
@@ -30,9 +32,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+Instrumentator().instrument(app).expose(app)
+
 # Include routers
 app.include_router(predict.router)
 app.include_router(llm.router)
+app.include_router(dashboard_router)
 
 
 @app.get("/")
