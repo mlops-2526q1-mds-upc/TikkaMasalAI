@@ -46,9 +46,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Predict Endpoint Predict Post"
+                  "$ref": "#/components/schemas/PredictionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "File must be an image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__predict__ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Prediction failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__predict__ErrorResponse"
                 }
               }
             }
@@ -90,9 +108,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Explain Prediction Predict Explain Post"
+                  "$ref": "#/components/schemas/ExplainResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "File must be an image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__predict__ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Explainability generation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__predict__ErrorResponse"
                 }
               }
             }
@@ -134,9 +170,37 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Generate Text Llm Generate Post"
+                  "$ref": "#/components/schemas/LLMResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Ollama not running or model missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__llm__ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Ollama timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__llm__ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__llm__ErrorResponse"
                 }
               }
             }
@@ -168,9 +232,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Check Ollama Health Llm Health Get"
+                  "$ref": "#/components/schemas/LLMHealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Ollama not running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__llm__ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/src__backend__routers__llm__ErrorResponse"
                 }
               }
             }
@@ -206,7 +288,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             }
           }
@@ -223,7 +307,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             }
           }
@@ -261,6 +347,82 @@
         ],
         "title": "Body_predict_endpoint_predict_post"
       },
+      "ExplainResponse": {
+        "properties": {
+          "predicted_class": {
+            "type": "string",
+            "title": "Predicted Class",
+            "examples": [
+              "guacamole"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "examples": [
+              0.9968
+            ]
+          },
+          "attention_map": {
+            "type": "string",
+            "title": "Attention Map",
+            "description": "Base64-encoded PNG",
+            "examples": [
+              "iVBORw0KGgoAAAANS..."
+            ]
+          },
+          "num_layers": {
+            "type": "integer",
+            "title": "Num Layers",
+            "examples": [
+              12
+            ]
+          },
+          "num_heads": {
+            "type": "integer",
+            "title": "Num Heads",
+            "examples": [
+              12
+            ]
+          },
+          "grid_size": {
+            "type": "string",
+            "title": "Grid Size",
+            "examples": [
+              "13x15"
+            ]
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename",
+            "examples": [
+              "food.jpg"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "predicted_class",
+          "confidence",
+          "attention_map",
+          "num_layers",
+          "num_heads",
+          "grid_size",
+          "filename"
+        ],
+        "title": "ExplainResponse",
+        "example": {
+          "attention_map": "iVBORw0KGgoAAAANS...",
+          "confidence": 0.9968,
+          "filename": "food.jpg",
+          "grid_size": "13x15",
+          "num_heads": 12,
+          "num_layers": 12,
+          "predicted_class": "guacamole"
+        }
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -274,21 +436,89 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "LLMHealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "examples": [
+              "healthy"
+            ]
+          },
+          "ollama_url": {
+            "type": "string",
+            "title": "Ollama Url",
+            "examples": [
+              "http://localhost:11434"
+            ]
+          },
+          "available_models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Available Models",
+            "examples": [
+              [
+                "gemma3:270m",
+                "llama3.1:8b"
+              ]
+            ]
+          },
+          "configured_model": {
+            "type": "string",
+            "title": "Configured Model",
+            "examples": [
+              "gemma3:270m"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "ollama_url",
+          "available_models",
+          "configured_model"
+        ],
+        "title": "LLMHealthResponse",
+        "example": {
+          "available_models": [
+            "gemma3:270m",
+            "llama3.1:8b"
+          ],
+          "configured_model": "gemma3:270m",
+          "ollama_url": "http://localhost:11434",
+          "status": "healthy"
+        }
+      },
       "LLMRequest": {
         "properties": {
           "prompt": {
             "type": "string",
-            "title": "Prompt"
+            "title": "Prompt",
+            "examples": [
+              "Write a haiku about masala dosa."
+            ]
           },
           "temperature": {
             "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.0,
             "title": "Temperature",
-            "default": 0.7
+            "default": 0.7,
+            "examples": [
+              0.7
+            ]
           },
           "max_tokens": {
             "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 1.0,
             "title": "Max Tokens",
-            "default": 500
+            "default": 500,
+            "examples": [
+              200
+            ]
           }
         },
         "type": "object",
@@ -296,7 +526,95 @@
           "prompt"
         ],
         "title": "LLMRequest",
-        "description": "Request model for LLM generation."
+        "description": "Request model for LLM generation.",
+        "example": {
+          "max_tokens": 200,
+          "prompt": "Write a haiku about masala dosa.",
+          "temperature": 0.7
+        }
+      },
+      "LLMResponse": {
+        "properties": {
+          "response": {
+            "type": "string",
+            "title": "Response",
+            "examples": [
+              "Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn."
+            ]
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "examples": [
+              "gemma3:270m"
+            ]
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done",
+            "default": false,
+            "examples": [
+              true
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "model"
+        ],
+        "title": "LLMResponse",
+        "description": "Response model for LLM generation.",
+        "example": {
+          "done": true,
+          "model": "gemma3:270m",
+          "response": "Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn."
+        }
+      },
+      "PredictionResponse": {
+        "properties": {
+          "predictions": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Predictions"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          }
+        },
+        "type": "object",
+        "required": [
+          "predictions",
+          "filename"
+        ],
+        "title": "PredictionResponse",
+        "example": {
+          "filename": "food.jpg",
+          "predictions": {
+            "guacamole": 0.996,
+            "nachos": 0.001,
+            "salsa": 0.002
+          }
+        }
+      },
+      "StatusResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "StatusResponse",
+        "example": {
+          "status": "ok"
+        }
       },
       "ValidationError": {
         "properties": {
@@ -330,6 +648,38 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "src__backend__routers__llm__ErrorResponse": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "examples": [
+              "Ollama service is not running. Please start Ollama first."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse"
+      },
+      "src__backend__routers__predict__ErrorResponse": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "examples": [
+              "File must be an image"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse"
       }
     }
   }

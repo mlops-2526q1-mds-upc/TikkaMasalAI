@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 
 router = APIRouter(prefix="/llm", tags=["llm"])
 
@@ -17,16 +17,59 @@ MODEL_NAME = "gemma3:270m"
 class LLMRequest(BaseModel):
     """Request model for LLM generation."""
 
-    prompt: str
-    temperature: float = 0.7
-    max_tokens: int = 500
+    prompt: str = Field(examples=["Write a haiku about masala dosa."])
+    temperature: float = Field(default=0.7, ge=0, le=2, examples=[0.7])
+    max_tokens: int = Field(default=500, ge=1, le=4096, examples=[200])
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "prompt": "Write a haiku about masala dosa.",
+                "temperature": 0.7,
+                "max_tokens": 200,
+            }
+        }
+    )
 
 
 class LLMResponse(BaseModel):
     """Response model for LLM generation."""
 
-    response: str
-    model: str
+    response: str = Field(examples=["Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn."])
+    model: str = Field(examples=["gemma3:270m"])
+    done: bool = Field(default=False, examples=[True])
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "response": "Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn.",
+                "model": "gemma3:270m",
+                "done": True
+            }
+        }
+    )
+
+
+class ErrorResponse(BaseModel):
+    detail: str = Field(examples=["Ollama service is not running. Please start Ollama first."])
+
+
+class LLMHealthResponse(BaseModel):
+    status: str = Field(examples=["healthy"])
+    ollama_url: str = Field(examples=["http://localhost:11434"])
+    available_models: list[str] = Field(examples=[["gemma3:270m", "llama3.1:8b"]])
+    configured_model: str = Field(examples=["gemma3:270m"])
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "status": "healthy",
+                "ollama_url": "http://localhost:11434",
+                "available_models": ["gemma3:270m", "llama3.1:8b"],
+                "configured_model": "gemma3:270m",
+            }
+        }
+    )
 
 
 @router.post(
@@ -37,6 +80,12 @@ class LLMResponse(BaseModel):
         "POST a JSON body with `prompt`, optional `temperature` and `max_tokens`.\n"
         "Returns the generated text and the model used."
     ),
+    response_model=LLMResponse,
+    responses={
+        503: {"model": ErrorResponse, "description": "Ollama not running or model missing"},
+        504: {"model": ErrorResponse, "description": "Ollama timeout"},
+        500: {"model": ErrorResponse, "description": "Unexpected error"},
+    },
 )
 async def generate_text(request: LLMRequest) -> dict[str, Any]:
     """Generate text using Ollama LLM.
@@ -111,6 +160,11 @@ async def generate_text(request: LLMRequest) -> dict[str, Any]:
         " available models plus the configured model name.\n\n"
         "Returns a JSON object with `status`, `ollama_url`, `available_models` and `configured_model`."
     ),
+    response_model=LLMHealthResponse,
+    responses={
+        503: {"model": ErrorResponse, "description": "Ollama not running"},
+        500: {"model": ErrorResponse, "description": "Unexpected error"},
+    },
 )
 async def check_ollama_health() -> dict[str, Any]:
     """Check if Ollama service is running and accessible.

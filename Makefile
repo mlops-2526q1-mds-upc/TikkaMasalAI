@@ -148,7 +148,6 @@ docs-build: ## Build the documentation site (MkDocs)
 	$(MAKE) api-docs
 	uv run mkdocs build --strict -f docs/mkdocs.yml
 
-# This is a ".PHONY" target, meaning it's just a command, not a file.
 .PHONY: docs-kill-port
 docs-kill-port: ## Kills any process running on port 8001
 	@echo "Checking for existing process on port 8001..."

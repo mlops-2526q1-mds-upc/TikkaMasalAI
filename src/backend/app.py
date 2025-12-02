@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
+from pydantic import BaseModel, ConfigDict
 
 from src.backend.routers import dashboard, llm, predict
 
@@ -39,13 +40,19 @@ app.include_router(llm.router)
 app.include_router(dashboard.router)
 
 
-@app.get("/")
-def read_root():
+class StatusResponse(BaseModel):
+    status: str
+
+    model_config = ConfigDict(json_schema_extra={"example": {"status": "ok"}})
+
+
+@app.get("/", response_model=StatusResponse)
+def read_root() -> StatusResponse:
     return {"status": "TikkaMasalAI Backend is running."}
 
 
-@app.get("/health")
-def health_check():
+@app.get("/health", response_model=StatusResponse)
+def health_check() -> StatusResponse:
     """Lightweight health endpoint for container orchestration.
 
     Returns 200 OK when the app is up and routers are registered.
