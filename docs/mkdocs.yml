@@ -9,8 +9,8 @@ nav:
       - Linting: development/ruff_ci.md
       - Containers & Compose: development/containers.md
       - Deployment: development/deployment.md
-      - Model Deployment - API: development/model_deployment_api.md
-        - Model Deployment - Component Delivery: development/model_deployment_component_delivery.md
+      - Model Deployment API: development/model_deployment_api.md
+      - Model Deployment Component Delivery: development/model_deployment_component_delivery.md
       - Testing: development/testing.md
   - API Documentation: api.html
 
