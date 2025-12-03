@@ -130,11 +130,22 @@ def main() -> None:
         st.header("Predicted Dish")
         st.info("Prediction received, but no obvious label was found in the response.")
 
-    # Tabs for next steps
-    tab1, tab2, tab3 = st.tabs(["Dish Information", "Explain Prediction", "Raw JSON"])
+    # Segmented control for next steps with formatted labels
+    def _format_action_label(opt: str) -> str:
+        return "ℹ️ **Dish Information**" if opt == "info" else "👨‍🏫 **Explain Prediction**"
 
-    # Tab 1: Get Recipe (LLM)
-    with tab1:
+    section = st.segmented_control(
+        label="",
+        options=["info", "explain"],
+        key="seg_actions",
+        default="info",
+        format_func=_format_action_label,
+        width="stretch"
+    )
+    st.divider()
+
+    # Section: Get Recipe (LLM)
+    if section == "info":
         st.subheader("Information About the Dish")
         recipe_question = f"How do I prepare {primary_label}? Provide ingredients and clear step-by-step cooking instructions. Be concise."
         nutrient_value_question = f"What are the nutritional values of {primary_label}? Provide information for an amount in which it is typically consumed."
@@ -199,8 +210,8 @@ def main() -> None:
                 st.subheader("Suggested recipe")
                 st.markdown(llm_text)
 
-    # Tab 2: Explain Prediction (Heatmap)
-    with tab2:
+    # Section: Explain Prediction (Heatmap)
+    if section == "explain":
         st.subheader("Explain prediction")
         # Show top-5 class probabilities from the earlier prediction
         top5 = extract_top_scores(pred_json, top_n=5)
@@ -293,21 +304,6 @@ def main() -> None:
                             st.error(f"Failed to overlay heatmap: {e}")
                 except requests.exceptions.RequestException as request_error:
                     st.error(f"Explain request failed: {request_error}")
-
-    # Tab 3: Raw JSON
-    with tab3:
-        st.subheader("Raw responses")
-        with st.expander("Show Raw Classification Response"):
-            st.json(pred_json)
-
-        if st.session_state.get("tikka_llm_response") is not None:
-            with st.expander("Show Raw LLM Response"):
-                st.json(st.session_state["tikka_llm_response"])
-
-        if st.session_state.get("tikka_explain_raw") is not None:
-            with st.expander("Show Raw Explanation Response"):
-                st.json(st.session_state["tikka_explain_raw"])
-
 
 if __name__ == "__main__":
     main()
