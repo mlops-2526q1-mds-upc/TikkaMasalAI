@@ -592,11 +592,13 @@
         ],
         "title": "PredictionResponse",
         "example": {
-          "filename": "food.jpg",
+          "filename": "guacamole.jpeg",
           "predictions": {
-            "guacamole": 0.996,
-            "nachos": 0.001,
-            "salsa": 0.002
+            "ceviche": 0.001,
+            "chicken_curry": 0.0,
+            "guacamole": 0.997,
+            "nachos": 0.0,
+            "tuna_tartare": 0.0
           }
         }
       },

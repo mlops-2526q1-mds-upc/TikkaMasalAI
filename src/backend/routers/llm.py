@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 import httpx
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 router = APIRouter(prefix="/llm", tags=["llm"])
 
@@ -35,7 +35,9 @@ class LLMRequest(BaseModel):
 class LLMResponse(BaseModel):
     """Response model for LLM generation."""
 
-    response: str = Field(examples=["Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn."])
+    response: str = Field(
+        examples=["Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn."]
+    )
     model: str = Field(examples=["gemma3:270m"])
     done: bool = Field(default=False, examples=[True])
 
@@ -44,7 +46,7 @@ class LLMResponse(BaseModel):
             "example": {
                 "response": "Golden crisp dosa,\nSpiced potato dreams within,\nCurry-scented dawn.",
                 "model": "gemma3:270m",
-                "done": True
+                "done": True,
             }
         }
     )

@@ -15,12 +15,12 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
 from scipy.ndimage import zoom
 import torch
 from transformers import AutoImageProcessor, SiglipForImageClassification
 
 from src.labels import LABELS
-from pydantic import BaseModel, Field, ConfigDict
 
 router = APIRouter(prefix="/predict", tags=["prediction"])
 
@@ -49,9 +49,9 @@ class PredictionResponse(BaseModel):
                     "ceviche": 0.001,
                     "tuna_tartare": 0.0,
                     "nachos": 0.0,
-                    "chicken_curry": 0.0
+                    "chicken_curry": 0.0,
                 },
-                "filename": "guacamole.jpeg"
+                "filename": "guacamole.jpeg",
             }
         }
     )
@@ -82,7 +82,7 @@ class ExplainResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    detail: str = Field(examples=["File must be an image"]) 
+    detail: str = Field(examples=["File must be an image"])
 
 
 @lru_cache
