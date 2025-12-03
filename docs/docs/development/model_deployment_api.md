@@ -87,11 +87,7 @@ This section intentionally defers the full rollout mechanics (multi-arch builds,
     - Predict + Explain: `tikkamasalai-requests/predict-explain.bru`
     - LLM health/generate: `tikkamasalai-requests/llm-health.bru`, `tikkamasalai-requests/llm-generate.bru`
   - Usage: The workflow installs Bruno CLI (`@usebruno/cli`) and executes `make test-deployed-api` targeting the `production` environment.
-    
-    ```zsh
-    # Run deployed API tests (production)
-    make test-deployed-api
-    ```
+  - Example: Run deployed API tests (production): `make test-deployed-api`
  
 For CI validation of documentation freshness (OpenAPI regeneration and MkDocs build), see the CI/CD section in [Model Deployment: Component Delivery](./model_deployment_component_delivery.md).
 
