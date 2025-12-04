@@ -7,14 +7,13 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter()
 
-
 @router.get("/dashboard", response_class=HTMLResponse)
 async def metrics_dashboard():
     """
     Enhanced visual dashboard for Prometheus metrics with charts.
     Includes Chart.js for visualizations.
     """
-
+    
     html_content = """
     <!DOCTYPE html>
     <html>
@@ -656,5 +655,5 @@ async def metrics_dashboard():
     </body>
     </html>
     """
-
+    
     return html_content

@@ -279,6 +279,25 @@
         }
       }
     },
+    "/dashboard": {
+      "get": {
+        "summary": "Metrics Dashboard",
+        "description": "Enhanced visual dashboard for Prometheus metrics with charts.\nIncludes Chart.js for visualizations.",
+        "operationId": "metrics_dashboard_dashboard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Read Root",
