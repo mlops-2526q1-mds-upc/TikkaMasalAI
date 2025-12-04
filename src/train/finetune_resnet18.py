@@ -43,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Fine-tune ResNet-18 on Food-101 with configuration support"
     )
+    parser.set_defaults(track_emissions=None)
 
     # Configuration file argument
     parser.add_argument(
@@ -70,6 +71,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", type=str, default="microsoft/resnet-18")
     parser.add_argument("--output_dir", type=str, default=None)
 
+    parser.add_argument(
+        "--track-emissions",
+        dest="track_emissions",
+        action="store_true",
+        help="Enable CodeCarbon emissions tracking",
+    )
+    parser.add_argument(
+        "--no-track-emissions",
+        dest="track_emissions",
+        action="store_false",
+        help="Disable CodeCarbon emissions tracking",
+    )
+
     # Training arguments
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch_size", type=int, default=32)
@@ -85,6 +99,12 @@ def parse_args() -> argparse.Namespace:
 def create_params_from_args(args: argparse.Namespace) -> TrainingParams:
     """Create TrainingParams from command line arguments."""
     from src.train.config import DataConfig, ModelConfig, OutputConfig, TrainingConfig
+
+    output_config = OutputConfig(
+        output_dir=args.output_dir,
+    )
+    if args.track_emissions is not None:
+        output_config.track_emissions = args.track_emissions
 
     return TrainingParams(
         data=DataConfig(
@@ -105,9 +125,7 @@ def create_params_from_args(args: argparse.Namespace) -> TrainingParams:
             fp16=args.fp16,
             seed=args.seed,
         ),
-        output=OutputConfig(
-            output_dir=args.output_dir,
-        ),
+        output=output_config,
     )
 
 
@@ -133,9 +151,13 @@ def main() -> None:
             params.data.eval_samples = args.eval_samples
         if args.output_dir is not None:
             params.output.output_dir = args.output_dir
+        if args.track_emissions is not None:
+            params.output.track_emissions = args.track_emissions
     else:
         # Use command line arguments
         params = create_params_from_args(args)
+        if args.track_emissions is not None:
+            params.output.track_emissions = args.track_emissions
 
     # Print configuration
     print("Training Configuration:")
