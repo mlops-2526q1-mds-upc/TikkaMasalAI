@@ -1,11 +1,16 @@
 name: Docs
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches: [main]
+  pull_request:
+
+# Grant GITHUB_TOKEN the permissions to deploy to Pages
+permissions:
+  contents: write
 
 jobs:
-  docs-check:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,27 +26,25 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Install project deps (only backend)
+      # Install only backend Python deps
+      - name: Install backend dependencies
         run: uv sync --only-group backend
 
-      - name: Generate backend API docs
-        run: make api-docs
-
-      - name: Ensure API docs are committed
+      # Generate the OpenAPI JSON and HTML fresh in CI
+      - name: Generate API Docs
         run: |
-          git diff --exit-code -- docs/docs/api.html || (
-            echo "::error::API docs are out of date. Run 'make api-docs' and commit docs/docs/api.html." && exit 1
-          )
+          uv run src/backend/export_schema.py
+          npx --yes @redocly/cli build-docs src/backend/openapi.json -o docs/docs/api.html
 
-      - name: Build docs site (MkDocs)
-        run: make docs-build
-
-      - name: Upload docs site (PR preview)
+      # If this is a PR: Just build to check for errors
+      - name: Build Site (Dry Run)
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: docs-site
-          path: site
+        run: uv run mkdocs build --strict -f docs/mkdocs.yml
+
+      # If this is Main: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          uv run mkdocs gh-deploy --force -f docs/mkdocs.yml
