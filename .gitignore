@@ -166,6 +166,10 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# Generated docs artifacts
+docs/docs/api.html
+site/
+
 # mypy
 .mypy_cache/
 .dmypy.json
