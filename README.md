@@ -4,7 +4,7 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-An MLOps project for food classification using computer vision techniques.
+An MLOps project for food classification using computer vision techniques. You can view a comprehensive documentation focusing on development aspects via GitHub pages [here](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
 
 ## Setup
 ### uv
