@@ -13,6 +13,7 @@ PYTHON_INTERPRETER = python
 .PHONY: help \
 	requirements create_environment clean lint format \
 	test test-backend code-coverage \
+	dvc-pull \
 	build-frontend-docker run-frontend-docker frontend-docker push-frontend-docker \
 	build-backend-docker run-backend-docker backend-docker push-backend-docker \
 	compose-up compose-down compose-logs \
@@ -136,6 +137,9 @@ train-resnet18: ## Fine-tune ResNet-18 on Food-101 (local imagefolder or HF data
 eval: ## Evaluate models using the unified evaluation script (MLflow tracking)
 	uv run src/eval/eval.py
 
+dvc-pull: ## Pull DVC-tracked artifacts using uv
+	uv run dvc pull
+
 #################################################################################
 # DOCUMENTATION                                                                 #
 #################################################################################
@@ -148,9 +152,12 @@ docs-build: ## Build the documentation site (MkDocs)
 	$(MAKE) api-docs
 	uv run mkdocs build --strict -f docs/mkdocs.yml
 
-serve: api-docs ## Generate docs then serve locally in foreground
+docs-serve: api-docs ## Generate docs then serve locally in foreground
 	@echo "Serving docs... Press Ctrl+C to stop."
 	uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8001
+
+docs: docs-build ## Build documentation then serve it locally (blocks)
+	$(MAKE) docs-serve
 
 #################################################################################
 # Self Documenting Commands                                                     #
