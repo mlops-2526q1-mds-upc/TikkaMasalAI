@@ -10,8 +10,8 @@ stages:
     outs:
     - path: data/raw/food101
       hash: md5
-      md5: 7015b3b9a92ad5bc27547e251b8eeade.dir
-      size: 5059985528
+      md5: 65f15b711a33703bfa6baa2be54ddfca.dir
+      size: 5059985525
       nfiles: 40
   train:
     cmd: uv run python -m src.train.finetune_resnet18 --epochs 1 --train_samples
@@ -25,7 +25,7 @@ stages:
     outs:
     - path: models/resnet18-food101-1e-2k
       hash: md5
-      md5: 80c33584f12b6aa29c871f6232c58deb.dir
+      md5: 76c45f22f8c90ed1c5f1823a1d179674.dir
       size: 179850959
       nfiles: 12
   eval:
