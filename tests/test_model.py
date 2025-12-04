@@ -14,8 +14,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-
-
 @pytest.fixture(scope="module")
 def prithiv_pipe():
     return PrithivMlFood101()
