@@ -53,10 +53,10 @@ format: ## Format source code with ruff
 #################################################################################
 
 test: ## Run tests
-	uv run pytest -q
+	uv run pytest
 
 test-backend: ## Test only the backend
-	uv run pytest -q tests/backend
+	uv run pytest tests/backend
 
 code-coverage: ## Open code coverage report
 	open reports/coverage/index.html
