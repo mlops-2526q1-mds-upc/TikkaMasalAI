@@ -140,7 +140,7 @@ def main() -> None:
         key="seg_actions",
         default="info",
         format_func=_format_action_label,
-        width="stretch"
+        width="stretch",
     )
     st.divider()
 
@@ -292,9 +292,7 @@ def main() -> None:
                         )
                     elif heatmap_arr is not None:
                         try:
-                            blended = overlay_heatmap_on_image(
-                                image, heatmap_arr, opacity=0.5
-                            )
+                            blended = overlay_heatmap_on_image(image, heatmap_arr, opacity=0.5)
                             st.image(
                                 blended,
                                 caption="Heatmap overlay",
@@ -304,6 +302,7 @@ def main() -> None:
                             st.error(f"Failed to overlay heatmap: {e}")
                 except requests.exceptions.RequestException as request_error:
                     st.error(f"Explain request failed: {request_error}")
+
 
 if __name__ == "__main__":
     main()
