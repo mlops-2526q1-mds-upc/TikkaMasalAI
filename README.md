@@ -21,7 +21,7 @@ Sync project dependencies defined in *pyproject.toml* (uses the existing *uv.loc
 uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
 uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
 ```
-2. Pull data with DVC: Pull the data from the configured remote: `dvc pull`.
+2. Pull data with DVC: Pull the data from the configured remote using the project environment: `uv run dvc pull`.
 
 ## Makefile quick reference
 New to the project? The Makefile bundles common tasks so you don’t have to remember long commands.
@@ -48,7 +48,7 @@ Project workflows:
 
 Documentation:
 - `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
-- `make docs-serve` – Serve docs locally at http://127.0.0.1:8000 with live reload
+- `make docs-serve` – Serve docs locally at http://127.0.0.1:8001 with live reload
 - `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
 
 Containerization and deployment:
