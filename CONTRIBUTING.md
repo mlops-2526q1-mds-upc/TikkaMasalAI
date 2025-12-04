@@ -52,15 +52,13 @@ fix/resnet18-loading-bug
 chore/ruff-ci-all-branches
 ```
 
-Required: prepend the corresponding emoji at the start of PR titles to make intent obvious in the review list. Example PR title formats (mandatory):
+Pull request titles should start with the same short prefix to communicate intent quickly. Example title formats:
 
 ```
-✨ feat: add food101 evaluator sampling
-🐛 fix: correct resnet18 loading bug
-📝 docs: update contributing guide with emojis
+feat: add food101 evaluator sampling
+fix: correct resnet18 loading bug
+docs: update contributing guide with new testing section
 ```
-
-These emojis are mandatory for PR titles. The PR checklist and reviewers may ask you to update titles that don't follow this convention; CI or bots may also enforce this in the future.
 
 ## Commit Messages
 Follow conventional-ish style:
@@ -138,6 +136,13 @@ make test            # preferred (uses uv in Makefile)
 # or
 uv run pytest -q     # direct invocation
 ```
+
+API smoke tests (Bruno):
+```bash
+make test-local-api      # hits local docker-compose stack
+make test-deployed-api   # hits the remote environment defined in tikkamasalai-requests/environments/production.bru
+```
+> Configure the Bruno environment files with the correct base URLs + secrets before running the deployed variant.
 
 ## Documentation Expectations
 Update or add:
