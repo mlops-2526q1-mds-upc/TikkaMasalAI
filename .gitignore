@@ -205,8 +205,5 @@ ssh-key
 /models/
 *.pth
 
-# images
-*.png
-
 # shap
 .npz
