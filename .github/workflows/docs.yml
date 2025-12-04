@@ -2,7 +2,7 @@ name: Docs
 
 on:
   push:
-    branches: [main, feat/docs-gh-pages]
+    branches: [main]
   pull_request:
 
 # Grant GITHUB_TOKEN the permissions to deploy to Pages
@@ -26,9 +26,9 @@ jobs:
         with:
           node-version: '20'
 
-      # Install Python deps
-      - name: Install dependencies
-        run: uv sync --all-extras --dev
+      # Install only backend Python deps
+      - name: Install backend dependencies
+        run: uv sync --only-group backend
 
       # Generate the OpenAPI JSON and HTML fresh in CI
       - name: Generate API Docs
