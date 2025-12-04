@@ -1,6 +1,6 @@
 # Contributing to TikkaMasalAI
 
-Thanks for your interest in contributing! This document explains how to propose changes, the pull request (PR) workflow, coding standards, and tooling (Ruff, tests, pre-commit).
+Thanks for your interest in contributing! This document explains how to propose changes, the pull request (PR) workflow, coding standards, and tooling (Ruff, tests).
 
 ## Table of Contents
 - [Getting Started](#getting-started)
@@ -8,7 +8,6 @@ Thanks for your interest in contributing! This document explains how to propose 
 - [Commit Messages](#commit-messages)
 - [Pull Request Checklist](#pull-request-checklist)
 - [Code Style & Linting (Ruff)](#code-style--linting-ruff)
-- [Formatting & Pre-commit Hooks](#formatting--pre-commit-hooks)
 - [Testing Guidelines](#testing-guidelines)
 - [Documentation Expectations](#documentation-expectations)
 - [CI Pipeline](#ci-pipeline)
@@ -28,10 +27,6 @@ source .venv/bin/activate
 
 # install dependencies
 uv sync
-
-# install pre-commit hooks
-pre-commit install
-pre-commit run --all-files  # initial cleanup
 ```
 > If you use another virtual env tool (e.g. conda, pyenv), ensure Python matches `>=3.10,<3.13`.
 
@@ -74,7 +69,6 @@ Keep summary <= 72 chars. Body (if present) explains what/why, not how.
 Before opening / marking ready for review:
 - [ ] Branch up to date with latest `main`
 - [ ] `make format` run (or `ruff check --fix && ruff format`)
-- [ ] `pre-commit run --all-files` clean / staged any modifications
 - [ ] `ruff check` passes with no errors
 - [ ] Tests added/updated (if behavior change)
 - [ ] `uv run pytest -q` passes locally
@@ -109,19 +103,6 @@ ruff format           # apply Ruff's formatter
 CI runs `ruff check .` on every push + PR.
 
 Full code style (naming, docstrings, typing, imports, tests, performance, security) lives in `docs/development/code_style.md`. Treat that document as the single source of truth. Propose any style changes by updating that file in the same PR.
-
-## Formatting & Pre-commit Hooks
-We use a single Ruff pre-commit hook (auto-fix). Install once:
-```bash
-pip install pre-commit
-pre-commit install
-```
-On commit, Ruff may modify files; re-stage and re-commit if needed.
-Manual full pass (recommended before PR):
-```bash
-make format          # ruff check --fix + ruff format
-pre-commit run --all-files
-```
 
 ## Testing Guidelines
 - Put tests under `tests/`.

@@ -55,7 +55,7 @@ Mermaid diagram + deployment details live in [`docs/docs/development/containers.
 - [Docker + Docker Compose](https://docs.docker.com/engine/install/) (for local stack and deployment parity)
 - Node.js ≥ 20 (Redoc CLI for API docs)
 - [Bruno CLI](https://www.usebruno.com/downloads) (`bru`) for API regression tests
-- Optional: DVC remote credentials (ask Hubert) to pull large datasets
+- Optional: DVC remote credentials (contact the team to get them) to pull large datasets
 
 ## Environment Setup
 ```bash
@@ -67,10 +67,9 @@ source .venv/bin/activate
 
 # 3) Install deps
 uv sync
-
-# 4) (Optional) Install pre-commit hooks
-pre-commit install && pre-commit run --all-files
 ```
+
+Once dependencies finish syncing, run `make test` to execute the full pytest suite and confirm your environment is healthy.
 
 ### Data (DVC)
 ```bash
