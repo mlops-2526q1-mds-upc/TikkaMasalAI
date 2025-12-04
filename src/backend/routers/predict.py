@@ -6,7 +6,7 @@ import io
 import logging
 import math
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 import matplotlib
 
@@ -15,6 +15,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
 from scipy.ndimage import zoom
 import torch
 from transformers import AutoImageProcessor, SiglipForImageClassification
@@ -34,6 +35,54 @@ DEVICE = (
     if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available()
     else (torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"))
 )
+
+
+class PredictionResponse(BaseModel):
+    predictions: Dict[str, float]
+    filename: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "predictions": {
+                    "guacamole": 0.997,
+                    "ceviche": 0.001,
+                    "tuna_tartare": 0.0,
+                    "nachos": 0.0,
+                    "chicken_curry": 0.0,
+                },
+                "filename": "guacamole.jpeg",
+            }
+        }
+    )
+
+
+class ExplainResponse(BaseModel):
+    predicted_class: str = Field(examples=["guacamole"])
+    confidence: float = Field(ge=0, le=1, examples=[0.9968])
+    attention_map: str = Field(description="Base64-encoded PNG", examples=["iVBORw0KGgoAAAANS..."])
+    num_layers: int = Field(examples=[12])
+    num_heads: int = Field(examples=[12])
+    grid_size: str = Field(examples=["13x15"])
+    filename: str = Field(examples=["food.jpg"])
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "predicted_class": "guacamole",
+                "confidence": 0.9968,
+                "attention_map": "iVBORw0KGgoAAAANS...",
+                "num_layers": 12,
+                "num_heads": 12,
+                "grid_size": "13x15",
+                "filename": "food.jpg",
+            }
+        }
+    )
+
+
+class ErrorResponse(BaseModel):
+    detail: str = Field(examples=["File must be an image"])
 
 
 @lru_cache
@@ -118,6 +167,11 @@ def classify_food(image: Image.Image) -> dict[str, float]:
     "",
     summary="Predict Food Class",
     description="Run the image classification model on an uploaded image and return the top predicted labels with their probabilities.\n\nThis endpoint accepts a multipart/form-data POST with a file field named 'image'.",
+    response_model=PredictionResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "File must be an image"},
+        500: {"model": ErrorResponse, "description": "Prediction failed"},
+    },
 )
 async def predict_endpoint(image: UploadFile = File(...)) -> dict[str, Any]:
     """Predict the food type for an uploaded image.
@@ -305,6 +359,11 @@ def generate_attention_heatmap(image: Image.Image) -> dict[str, Any]:
     "/explain",
     summary="Generate Attention Heatmap",
     description="Creates an attention-based visualization showing which parts of the image the model focuses on for prediction.",
+    response_model=ExplainResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "File must be an image"},
+        500: {"model": ErrorResponse, "description": "Explainability generation failed"},
+    },
 )
 async def explain_prediction(image: UploadFile = File(...)) -> dict[str, Any]:
     """Generate attention-based explainability visualization for a food image.
