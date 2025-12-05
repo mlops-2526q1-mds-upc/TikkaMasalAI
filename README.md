@@ -133,6 +133,12 @@ make local-down    # stop and clean up
 - Mounts `src/frontend/.streamlit/secrets.toml` if present; never commit secrets.
 
 ### Production-like (registry images)
+Authenticate with GHCR first:
+1. Generate a GitHub Personal Access Token with at least `read:packages` scope. You can do so in the developer settings page of your GitHub account.
+2. Set the token via running `export GHCR_PAT=ghp_...`
+3. Log in once via `echo $GHCR_PAT | docker login ghcr.io -u <github-username> --password-stdin` (or enter the token interactively).
+4. Optional sanity check: `docker pull ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest`.
+
 ```bash
 make compose-up    # uses ghcr.io/mlops-2526q1-mds-upc/tikka-* images
 make compose-logs
