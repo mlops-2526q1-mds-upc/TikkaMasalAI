@@ -209,4 +209,4 @@ ssh-key
 *.png
 
 # shap
-.npz
+*.npz
