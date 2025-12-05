@@ -87,11 +87,11 @@ make dvc-pull
 The backend Dockerfile downloads model artifacts during the build. If authentication fails, the build now stops immediately, so follow this once per workstation:
 
 1. Authenticate and target the project:
+   > You need IAM rights (Project Editor or better) on this GCP project to complete the remaining steps. If you do not have access yet, contact Adrian and request to be added before proceeding.
     ```bash
     gcloud auth login
     gcloud config set project academic-torch-476716-h3
     ```
-   > You need IAM rights (Project Editor or better) on this GCP project to complete the remaining steps. If you do not have access yet, contact Adrian and request to be added before proceeding.
 2. Ensure the service account exists (**skip if service account already exsists**):
     ```bash
     gcloud iam service-accounts create tikka-backend --display-name="Tikka Backend CI"
