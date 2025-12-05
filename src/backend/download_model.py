@@ -13,9 +13,7 @@ def ensure_credentials():
             "GOOGLE_APPLICATION_CREDENTIALS is not set; cannot authenticate with GCP."
         )
     if not os.path.isfile(creds_path):
-        raise RuntimeError(
-            f"GOOGLE_APPLICATION_CREDENTIALS points to missing file: {creds_path}"
-        )
+        raise RuntimeError(f"GOOGLE_APPLICATION_CREDENTIALS points to missing file: {creds_path}")
     return creds_path
 
 
@@ -53,7 +51,7 @@ if __name__ == "__main__":
     try:
         ensure_credentials()
         download_folder("tikkamasalai-models", "", "./models", project=project_id)
-        print(f"Model successfully downloaded from GCP!")
+        print("Model successfully downloaded from GCP!")
     except (RuntimeError, DefaultCredentialsError) as exc:
         print(f"Authentication failed: {exc}", file=sys.stderr)
         sys.exit(1)
