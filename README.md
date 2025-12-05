@@ -92,7 +92,7 @@ The backend Dockerfile downloads model artifacts during the build. If authentica
     gcloud auth login
     gcloud config set project academic-torch-476716-h3
     ```
-2. Ensure the service account exists (**skip if service account already exsists**):
+2. Ensure the service account exists (**skip if this throws the error that the service account already exsists**):
     ```bash
     gcloud iam service-accounts create tikka-backend --display-name="Tikka Backend CI"
     ```
