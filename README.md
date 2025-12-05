@@ -12,6 +12,7 @@
 - Lightweight LLM assistant via Ollama (`gemma3:270m`) to augment explanations
 - Automated docs (Redoc + MkDocs), Bruno-powered API tests, and GH Actions CI/CD with multi-arch image builds
 - DVC-managed datasets and GCS-hosted model artifacts for consistent dev/prod parity
+- We use a Makefile which contains many useful commands. Run `make help` to get an overview of them.
 
 ## Links
 - You can access our website at [tikkamasalai.tech](https://tikkamasalai.tech).
@@ -113,14 +114,8 @@ The backend Dockerfile downloads model artifacts during the build. If authentica
     export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/application_default_credentials.json"
     ```
 
-## Quickstart Workflow
-1. `make create_environment` (creates the uv venv) and activate it.
-2. `make requirements` to sync dependencies from `pyproject.toml` / `uv.lock`.
-3. (Optional) `make dvc-pull` (or `uv run dvc pull`) to fetch the Food-101 assets into `data/raw/food101`.
-4. `make lint && make test` to validate the installation.
-5. Choose a workflow below (run the stack, retrain, evaluate, etc.).
-
-`make help` prints all targets and short descriptions.
+## Verification
+(Optional) You can now verify that everything is correctly installed by running `make lint && make test` and running the workflows below.
 
 ## Running the Stack
 ### Local development (build images locally)
@@ -177,7 +172,7 @@ Health checks enforce the order: Ollama → Backend → Frontend. See [`docker-c
 - Run locally through Docker (`make run-frontend-docker`) or start the full stack via Compose to ensure Ollama + backend are healthy.
 
 ## Training & Evaluation
-- Fine-tune ResNet-18 (quick run):
+- Fine-tune ResNet-18 (quick run). Note that this might ask for your system password as it executeds a `sudo` command in the background.:
     ```bash
     uv run -m src.train.finetune_resnet18 --epochs 2 --train_samples 1000 --eval_samples 200 --output_dir models/resnet18-food101-2e-1k
     ```
