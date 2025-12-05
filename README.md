@@ -83,6 +83,36 @@ uv run dvc pull
 make dvc-pull
 ```
 
+### GCP Credentials (required for Docker builds)
+The backend Dockerfile downloads model artifacts during the build. If authentication fails, the build now stops immediately, so follow this once per workstation:
+
+1. Authenticate and target the project:
+    ```bash
+    gcloud auth login
+    gcloud config set project academic-torch-476716-h3
+    ```
+   > You need IAM rights (Project Editor or better) on this GCP project to complete the remaining steps. If you do not have access yet, contact Adrian and request to be added before proceeding.
+2. Ensure the service account exists (**skip if service account already exsists**):
+    ```bash
+    gcloud iam service-accounts create tikka-backend --display-name="Tikka Backend CI"
+    ```
+3. Grant it read access to the model bucket (add more roles if you store models elsewhere):
+    ```bash
+    gcloud projects add-iam-policy-binding $(gcloud config get-value core/project) \
+      --member="serviceAccount:tikka-backend@$(gcloud config get-value core/project).iam.gserviceaccount.com" \
+      --role="roles/storage.objectViewer"
+    ```
+4. Create the key in the location Compose expects, then lock it down:
+    ```bash
+    gcloud iam service-accounts keys create "$HOME/.config/gcloud/application_default_credentials.json" \
+      --iam-account="tikka-backend@$(gcloud config get-value core/project).iam.gserviceaccount.com"
+    chmod 600 "$HOME/.config/gcloud/application_default_credentials.json"
+    ```
+5. Export the env var (add to your shell profile for persistence):
+    ```bash
+    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/application_default_credentials.json"
+    ```
+
 ## Quickstart Workflow
 1. `make create_environment` (creates the uv venv) and activate it.
 2. `make requirements` to sync dependencies from `pyproject.toml` / `uv.lock`.
@@ -150,12 +180,11 @@ Health checks enforce the order: Ollama → Backend → Frontend. See [`docker-c
     uv run -m src.train.finetune_resnet18 --config configs/training_quick.yaml
     uv run -m src.train.finetune_resnet18 --config configs/training_default.yaml --epochs 5
     ```
-- Unified evaluation (logs to MLflow):
+- Unified evaluation (logs to MLflow on DagsHub):
     ```bash
     make eval                            # uv run src/eval/eval.py
     uv run -m src.eval.eval --resnet_model_path models/resnet18-food101-2e-1k
     uv run -m src.eval.shap_qa --model resnet18 --model-path models/resnet18-food101-2e-1k
-    uv run mlflow ui                     # browse results locally (default http://127.0.0.1:5000)
     ```
 
 ### Available Models
