@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Team Tikka MasalAI">
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Deployment - Tikka MasalAI</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Tikka MasalAI</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../contributing/" class="nav-link">Contributing</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Development</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../code_style/" class="dropdown-item">Code Style</a>
+</li>
+                                    
+<li>
+    <a href="../ruff_ci/" class="dropdown-item">Linting</a>
+</li>
+                                    
+<li>
+    <a href="../containers/" class="dropdown-item">Containers & Compose</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Deployment</a>
+</li>
+                                    
+<li>
+    <a href="../testing/" class="dropdown-item">Testing</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../api.html" class="nav-link">API Documentation</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                            <li class="nav-item">
+                                <a rel="prev" href="../containers/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../testing/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#deployment-strategy" class="nav-link">Deployment Strategy</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#prerequisites" class="nav-link">Prerequisites</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#system-architecture-api" class="nav-link">System Architecture &amp; API</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#images-and-tagging" class="nav-link">Images and Tagging</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#model-artifacts-gcs" class="nav-link">Model Artifacts (GCS)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#environments" class="nav-link">Environments</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#cloud-deployment-vm-on-gcp" class="nav-link">Cloud Deployment (VM on GCP)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rollout-with-docker-compose-server" class="nav-link">Rollout with Docker Compose (Server)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#health-checks-and-monitoring" class="nav-link">Health Checks and Monitoring</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#testing-after-deployment" class="nav-link">Testing After Deployment</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#security-compliance" class="nav-link">Security &amp; Compliance</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#adoption-developer-experience" class="nav-link">Adoption &amp; Developer Experience</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#see-also" class="nav-link">See Also</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="deployment-strategy">Deployment Strategy</h1>
+<p>This project deploys a small, containerized stack: backend (FastAPI), frontend (Streamlit), and an Ollama service for LLM helpers. You can run locally with Docker Compose or push images to GHCR for remote environments.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Docker and Docker Compose installed</li>
+<li>Node.js ≥ 20 (for <code>make api-docs</code> / Redoc build)</li>
+<li>Bruno CLI (<code>bru</code>) on PATH for API tests (optional)</li>
+<li>Python 3.10+ and <code>uv</code> for local tooling</li>
+</ul>
+<h2 id="system-architecture-api">System Architecture &amp; API</h2>
+<ul>
+<li>Framework: FastAPI app (<code>src/backend/app.py</code>) with CORS and Prometheus metrics.</li>
+<li>Routers under <code>src/backend/routers/</code>:<ul>
+<li><code>predict.py</code> (prefix <code>/predict</code>):<ul>
+<li><code>POST /predict</code>: Classify uploaded image (multipart <code>image</code>).</li>
+<li><code>POST /predict/explain</code>: Return attention heatmap + prediction metadata.</li>
+<li>Model + processor lazy-loaded via <code>@lru_cache</code>; device auto-selected (MPS → CUDA → CPU).</li>
+</ul>
+</li>
+<li><code>dashboard.py</code>: <code>GET /dashboard</code> HTML metrics dashboard fed by Prometheus <code>/metrics</code>.</li>
+<li><code>llm.py</code> (prefix <code>/llm</code>):<ul>
+<li><code>POST /llm/generate</code>: Generate text from prompt (JSON: <code>prompt</code>, <code>temperature</code>, <code>max_tokens</code>).</li>
+<li><code>GET /llm/health</code>: Check Ollama availability; returns available models and configured model.</li>
+<li>Config: <code>OLLAMA_HOST</code> (default <code>http://localhost:11434</code>), model <code>gemma3:270m</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>OpenAPI: Exportable via <code>src/backend/export_schema.py</code> to <code>src/backend/openapi.json</code> and published to docs.</li>
+<li>Observability: <code>prometheus_fastapi_instrumentator</code> exposes metrics; CORS configured for local dev and <code>tikkamasalai.tech</code>.</li>
+</ul>
+<h2 id="images-and-tagging">Images and Tagging</h2>
+<p>For per-service Dockerfiles, Compose service definitions, registry images, and CI/CD details, see Containers → <a href="../containers/">Compose &amp; CI/CD</a>.</p>
+<h2 id="model-artifacts-gcs">Model Artifacts (GCS)</h2>
+<ul>
+<li>Bucket: <code>tikkamasalai-models</code> (location: <code>eu</code>, multi‑region).</li>
+<li>Artifacts are downloaded during backend image build via <code>src/backend/download_model.py</code>.</li>
+<li>Build secrets provide GCP credentials (<code>GOOGLE_APPLICATION_CREDENTIALS</code>); <code>GOOGLE_CLOUD_PROJECT</code> is passed at build time.</li>
+<li>Files are synced to <code>./models</code> in the image. This avoids runtime stalls and ensures portable builds.</li>
+</ul>
+<h2 id="environments">Environments</h2>
+<p>Environment-specific Compose usage and image sources are documented in Containers → <a href="../containers/">Compose &amp; CI/CD</a>. In brief:
+- Development: <code>docker-compose-local.yml</code> builds backend/frontend locally and mounts frontend secrets.
+- Staging/Production: <code>docker-compose.yml</code> uses prebuilt GHCR images.</p>
+<h3 id="secrets-and-configuration">Secrets and Configuration</h3>
+<ul>
+<li>Frontend secrets: mount <code>./src/frontend/.streamlit/secrets.toml</code> into <code>/app/.streamlit/secrets.toml</code> (read-only) for local; use platform secret stores for remote.</li>
+<li>Backend runtime variables:<ul>
+<li><code>APP_DEBUG=false</code> for production-like runs.</li>
+<li><code>OLLAMA_HOST</code> must point to internal Ollama service (e.g., <code>http://ollama:11434</code> under Compose).</li>
+</ul>
+</li>
+</ul>
+<h2 id="cloud-deployment-vm-on-gcp">Cloud Deployment (VM on GCP)</h2>
+<ul>
+<li>Provider: GCP VM hosting backend and frontend; Ollama runs as a service.</li>
+<li>VM spec:<ul>
+<li>Location: <code>europe-west1-c</code> (region <code>europe-west1</code>).</li>
+<li>Machine type: <code>c4a-standard-2</code> (2 vCPUs, 8 GB RAM).</li>
+<li>CPU platform/Architecture: Google Axion, Arm64 (chosen to align with Apple Silicon dev machines and early non-multi-arch builds).</li>
+<li>OS image: <code>debian-12-bookworm-arm64-v20251014</code>.</li>
+<li>Boot disk: 20 GB Hyperdisk Balanced with daily schedule; additional disk attached to store both the image classification model and LLM.</li>
+</ul>
+</li>
+<li>Networking &amp; TLS: Nginx reverse proxy fronts <code>:443</code>; Certbot manages TLS; routes <code>tikkamasalai.tech</code> to frontend and <code>api.tikkamasalai.tech</code> to backend.</li>
+</ul>
+<h2 id="rollout-with-docker-compose-server">Rollout with Docker Compose (Server)</h2>
+<p>On a remote host with Docker and Compose installed:
+1) Copy <code>docker-compose.yml</code> (and optionally <code>docker-compose.override.yml</code>).
+2) Configure environment (<code>.env</code>) and secrets.
+3) Start:
+     docker compose up -d
+4) Verify health:
+     - Backend: <code>curl http://&lt;host&gt;:8000/health</code>
+     - Frontend: open <code>http://&lt;host&gt;:8501</code></p>
+<h2 id="health-checks-and-monitoring">Health Checks and Monitoring</h2>
+<p>Compose healthchecks and startup ordering are detailed in <a href="../containers/">Containers</a>. For quick verification after rollout, use <code>make compose-logs</code> (or <code>docker compose logs -f</code>).</p>
+<h2 id="testing-after-deployment">Testing After Deployment</h2>
+<ul>
+<li>Quick checks:<ul>
+<li>Backend health: <code>curl http://&lt;host&gt;:8000/health</code> → 200</li>
+<li>Frontend: available at <code>http://&lt;host&gt;:8501</code></li>
+</ul>
+</li>
+<li>Full guidance: Development → <a href="../testing/">Testing</a><ul>
+<li>Unit tests: <code>make test</code></li>
+<li>API tests (Bruno): <code>make test-local-api</code>, <code>make test-deployed-api</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="security-compliance">Security &amp; Compliance</h2>
+<ul>
+<li>Data handling: Images uploaded via multipart form; processed transiently in-memory; no persistence by default.</li>
+<li>Access control: Public API at <code>https://api.tikkamasalai.tech</code> (demo scope).</li>
+<li>CORS: Origins allowed for local and production domains.</li>
+<li>Secrets: Follow <code>CONTRIBUTING.md</code>; never commit credentials. Use env vars or secret stores.</li>
+<li>Future hardening: Consider HTTPS enforcement details (already via Nginx), rate limiting, and auth if usage expands.</li>
+</ul>
+<h2 id="adoption-developer-experience">Adoption &amp; Developer Experience</h2>
+<ul>
+<li>Ease of use: Simple multipart upload; predictable JSON responses; OpenAPI published via <code>make api-docs</code>.</li>
+<li>Versioning: Routes are currently unversioned (e.g., <code>/predict</code>). Versioning the API is a potential future enhancement.</li>
+</ul>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li>Containers &amp; Compose details: <a href="../containers/">Containers</a></li>
+<li>CI/CD, multi-arch builds, registry, and VM rollout: <a href="../containers/">Component Delivery</a></li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

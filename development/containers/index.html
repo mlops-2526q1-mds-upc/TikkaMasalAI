@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html data-bs-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Team Tikka MasalAI" name="author"/>
+<link href="../../img/favicon.ico" rel="shortcut icon"/>
+<title>Containers &amp; Compose - Tikka MasalAI</title>
+<link href="../../css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../../css/fontawesome.min.css" rel="stylesheet"/>
+<link href="../../css/brands.min.css" rel="stylesheet"/>
+<link href="../../css/solid.min.css" rel="stylesheet"/>
+<link href="../../css/v4-font-face.min.css" rel="stylesheet"/>
+<link href="../../css/base.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" id="hljs-light" rel="stylesheet"/>
+<link disabled="" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" id="hljs-dark" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body>
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<div class="container">
+<a class="navbar-brand" href="../..">Tikka MasalAI</a>
+<!-- Expander button -->
+<button aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar-collapse" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<!-- Expanded navigation -->
+<div class="navbar-collapse collapse" id="navbar-collapse">
+<!-- Main navigation -->
+<ul class="nav navbar-nav">
+<li class="nav-item">
+<a class="nav-link" href="../..">Home</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../contributing/">Contributing</a>
+</li>
+<li class="nav-item dropdown">
+<a aria-current="page" aria-expanded="false" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button">Development</a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="../code_style/">Code Style</a>
+</li>
+<li>
+<a class="dropdown-item" href="../ruff_ci/">Linting</a>
+</li>
+<li>
+<a aria-current="page" class="dropdown-item active" href="./">Containers &amp; Compose</a>
+</li>
+<li>
+<a class="dropdown-item" href="../deployment/">Deployment</a>
+</li>
+<li>
+<a class="dropdown-item" href="../testing/">Testing</a>
+</li>
+</ul>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../api.html">API Documentation</a>
+</li>
+</ul>
+<ul class="nav navbar-nav ms-md-auto">
+<li class="nav-item">
+<a class="nav-link" href="../ruff_ci/" rel="prev">
+<i class="fa fa-arrow-left"></i> Previous
+                                </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../deployment/" rel="next">
+                                    Next <i class="fa fa-arrow-right"></i>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row">
+<div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+<div class="navbar-header">
+<button class="navbar-toggler collapsed" data-bs-target="#toc-collapse" data-bs-toggle="collapse" title="Table of Contents" type="button">
+<span class="fa fa-angle-down"></span>
+</button>
+</div>
+<div class="navbar-collapse collapse card bg-body-tertiary" id="toc-collapse">
+<ul class="nav flex-column">
+<li class="nav-item" data-bs-level="1"><a class="nav-link" href="#containers-and-docker-compose">Containers and Docker Compose</a>
+<ul class="nav flex-column">
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#services-ports">Services &amp; Ports</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#architecture-mermaid">Architecture (Mermaid)</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#environment-and-secrets">Environment and Secrets</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#local-development-compose-builds-images-locally">Local Development (Compose builds images locally)</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#production-like-use-registry-images">Production-like (Use Registry Images)</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#cicd-multi-arch-builds-and-vm-rollout">CI/CD, Multi-Arch Builds, and VM Rollout</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#production-compose-services-summary">Production Compose Services (Summary)</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#vm-deployment-details">VM Deployment Details</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+<li class="nav-item" data-bs-level="2"><a class="nav-link" href="#see-also">See Also</a>
+<ul class="nav flex-column">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div>
+<div class="col-md-9" role="main">
+<h1 id="containers-and-docker-compose">Containers and Docker Compose</h1>
+<p>This project includes two Docker Compose setups and per-service Dockerfiles. Use the Make targets to keep commands short and consistent.</p>
+<ul>
+<li><code>docker-compose.yml</code>: uses prebuilt registry images; production-like</li>
+<li><code>docker-compose-local.yml</code>: builds backend/frontend locally from the Dockerfiles</li>
+</ul>
+<h2 id="services-ports">Services &amp; Ports</h2>
+<ul>
+<li>Services:<ul>
+<li><strong>ollama</strong>: Runs the Ollama server; persists models in <code>ollama_data</code> (<code>/root/.ollama</code>).</li>
+<li><strong>backend</strong>: FastAPI app at port 8000; depends on healthy Ollama; health: <code>GET /health</code>.</li>
+<li><strong>frontend</strong>: Streamlit UI at port 8501; depends on healthy backend.</li>
+<li><strong>ollama-init</strong>: One-shot helper that pulls <code>gemma3:270m</code> after Ollama is healthy.</li>
+</ul>
+</li>
+<li>Ports:<ul>
+<li><code>11434</code> → Ollama (bound to <code>127.0.0.1</code> in Compose)</li>
+<li><code>8000</code> → Backend API (<code>0.0.0.0:8000</code>)</li>
+<li><code>8501</code> → Frontend (<code>0.0.0.0:8501</code>)</li>
+</ul>
+</li>
+<li>Health and startup order: <code>depends_on</code> + healthchecks gate readiness.</li>
+<li>Persistence: <code>ollama_data</code> volume stores downloaded models across restarts.</li>
+</ul>
+<h2 id="architecture-mermaid">Architecture (Mermaid)</h2>
+<div class="mermaid">graph TD
+    U[User Browser] --&gt;|HTTP :8501| FE[frontend]
+    FE[frontend\nStreamlit] --&gt;|calls :8000| BE[backend\nFastAPI]
+    BE --&gt;|OLLAMA_HOST http://ollama:11434| OL[ollama]
+    OI[ollama-init\noneshot] -.-&gt;|pull gemma3:270m| OL
+    VOL[(ollama_data volume)] --- OL
+    BE -.depends_on (healthy).-&gt; OL
+    FE -.depends_on (healthy).-&gt; BE
+    OI -.depends_on (healthy).-&gt; OL
+</div>
+<h2 id="environment-and-secrets">Environment and Secrets</h2>
+<ul>
+<li>Backend uses <code>OLLAMA_HOST=http://ollama:11434</code> internally.</li>
+<li><code>APP_DEBUG=false</code> for production-like runs.</li>
+<li>Streamlit secrets:<ul>
+<li>Local dev: mount <code>./src/frontend/.streamlit/secrets.toml</code> → <code>/app/.streamlit/secrets.toml</code> (read-only).</li>
+<li>Never commit secrets.</li>
+</ul>
+</li>
+</ul>
+<h2 id="local-development-compose-builds-images-locally">Local Development (Compose builds images locally)</h2>
+<ul>
+<li>Build and run: <code>make local-up</code></li>
+<li>Stop: <code>make local-down</code></li>
+<li>Tail logs: <code>make local-logs</code></li>
+<li>What it does:<ul>
+<li>Builds images from <code>src/backend/Dockerfile</code> and <code>src/frontend/Dockerfile</code>.</li>
+<li>Mounts Streamlit secrets for the frontend (if present).</li>
+<li>Pulls the small <code>gemma3:270m</code> model via <code>ollama-init</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="production-like-use-registry-images">Production-like (Use Registry Images)</h2>
+<ul>
+<li>Start services in the background: <code>make compose-up</code></li>
+<li>Stop services: <code>make compose-down</code></li>
+<li>Tail logs: <code>make compose-logs</code></li>
+<li>Images:<ul>
+<li><code>docker-compose.yml</code> references GHCR images:<ul>
+<li><code>ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest</code></li>
+<li><code>ghcr.io/mlops-2526q1-mds-upc/tikka-frontend:latest</code></li>
+</ul>
+</li>
+<li>Ollama: <code>ollama/ollama:latest</code> from Docker Hub.</li>
+<li>Makefile push targets publish to GHCR:<ul>
+<li><code>make push-frontend-docker</code></li>
+<li><code>make push-backend-docker</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="cicd-multi-arch-builds-and-vm-rollout">CI/CD, Multi-Arch Builds, and VM Rollout</h2>
+<ul>
+<li>Build &amp; Deploy (GitHub Actions): <code>.github/workflows/deploy.yml</code><ul>
+<li>Triggers on pushes to <code>main</code>.</li>
+<li>Steps: Setup QEMU/Buildx → auth GHCR/GCP → build backend/frontend (multi-arch) with model download via secret → push images → SSH to VM to run <code>run.sh</code> (pull + restart services) → post-deploy API verification.</li>
+<li>Tags: <code>latest</code> and short SHA.</li>
+</ul>
+</li>
+<li>Tests (Code + API): <code>.github/workflows/tests.yml</code><ul>
+<li>Unit tests: <code>uv sync</code> + <code>make test</code>.</li>
+<li>Bruno API tests against deployed environment run post-deploy in <code>deploy.yml</code>.</li>
+</ul>
+</li>
+<li>Docs Validation: <code>.github/workflows/docs.yml</code><ul>
+<li>Regenerates OpenAPI via <code>make api-docs</code>; fails if <code>docs/docs/api.html</code> is outdated; builds MkDocs site and uploads artifact.</li>
+</ul>
+</li>
+<li>Multi-arch: Docker Buildx + QEMU produce <code>linux/amd64</code> and <code>linux/arm64</code> images.</li>
+<li>Registry:<ul>
+<li><code>ghcr.io/mlops-2526q1-mds-upc/tikka-backend</code></li>
+<li><code>ghcr.io/mlops-2526q1-mds-upc/tikka-frontend</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="production-compose-services-summary">Production Compose Services (Summary)</h2>
+<ul>
+<li><code>ollama</code>:<ul>
+<li>Image: <code>ollama/ollama:latest</code></li>
+<li>Env: <code>OLLAMA_HOST=0.0.0.0</code></li>
+<li>Volume: <code>ollama_data:/root/.ollama</code></li>
+<li>Healthcheck: <code>ollama list</code></li>
+<li>Restart: <code>unless-stopped</code></li>
+</ul>
+</li>
+<li><code>backend</code>:<ul>
+<li>Image: <code>ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest</code></li>
+<li>Env: <code>OLLAMA_HOST=http://ollama:11434</code>, <code>APP_DEBUG=${APP_DEBUG:-false}</code></li>
+<li>Depends on: <code>ollama</code> healthy</li>
+<li>Healthcheck: GET <code>http://127.0.0.1:8000/health</code></li>
+<li>Restart: <code>unless-stopped</code></li>
+</ul>
+</li>
+<li><code>frontend</code>:<ul>
+<li>Image: <code>ghcr.io/mlops-2526q1-mds-upc/tikka-frontend:latest</code></li>
+<li>Ports: <code>0.0.0.0:8501:8501</code></li>
+<li>Depends on: <code>backend</code> healthy</li>
+<li>Restart: <code>unless-stopped</code></li>
+</ul>
+</li>
+<li><code>ollama-init</code>:<ul>
+<li>Image: <code>ollama/ollama:latest</code></li>
+<li>Env: <code>OLLAMA_HOST=http://ollama:11434</code></li>
+<li>Depends on: <code>ollama</code> healthy</li>
+<li>Entrypoint: <code>ollama pull gemma3:270m</code></li>
+<li>Restart: <code>no</code></li>
+</ul>
+</li>
+<li>Volumes:<ul>
+<li><code>ollama_data: { driver: local }</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="vm-deployment-details">VM Deployment Details</h2>
+<ul>
+<li>Deploy script on VM: <code>~/run.sh</code> performs stop → cleanup → prune → pull → up in <code>~/tikkamasalai</code> folder, then validates health checks.</li>
+<li>Nginx config: <code>~/tikkamasalai/nginx/conf.d/default.conf</code> mounted into the container; Certbot volumes <code>./certbot/www</code> and <code>./certbot/conf</code>.</li>
+<li>TLS: Certs under <code>/etc/letsencrypt/live/tikkamasalai.tech-0001/</code> used for app and API server blocks.</li>
+</ul>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li>Deployment strategy, registry rollout, and API details: <a href="../deployment/">Deployment</a></li>
+</ul></div>
+</div>
+</div>
+<footer class="col-md-12">
+<hr/>
+<p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+</footer>
+<script src="../../js/bootstrap.bundle.min.js"></script>
+<script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+<script src="../../js/base.js"></script>
+<div aria-hidden="true" aria-labelledby="keyboardModalLabel" class="modal" id="mkdocs_keyboard_modal" role="dialog" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th style="width: 20%;">Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="help shortcut"><kbd>?</kbd></td>
+<td>Open this help</td>
+</tr>
+<tr>
+<td class="next shortcut"><kbd>n</kbd></td>
+<td>Next page</td>
+</tr>
+<tr>
+<td class="prev shortcut"><kbd>p</kbd></td>
+<td>Previous page</td>
+</tr>
+<tr>
+<td class="search shortcut"><kbd>s</kbd></td>
+<td>Search</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+</div>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
