@@ -16,13 +16,7 @@ ruff check --fix .    # auto-fix
 ruff format           # apply Ruff formatter
 ```
 
-### Pre-commit (Ruff only)
-
-```bash
-pip install pre-commit
-pre-commit install
-pre-commit run --all-files
-```
+For style rules and broader engineering conventions, see Development → [Code Style Guide](./code_style.md).
 
 ___
 

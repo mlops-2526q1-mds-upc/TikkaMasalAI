@@ -1,6 +1,20 @@
 import os
+import sys
 
+from google.auth.exceptions import DefaultCredentialsError
 from google.cloud import storage
+
+
+def ensure_credentials():
+    """Fail fast if GOOGLE_APPLICATION_CREDENTIALS is unset or invalid."""
+    creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    if not creds_path:
+        raise RuntimeError(
+            "GOOGLE_APPLICATION_CREDENTIALS is not set; cannot authenticate with GCP."
+        )
+    if not os.path.isfile(creds_path):
+        raise RuntimeError(f"GOOGLE_APPLICATION_CREDENTIALS points to missing file: {creds_path}")
+    return creds_path
 
 
 def download_blob(bucket_name, source_blob_name, destination_file_name, project=None):
@@ -33,4 +47,11 @@ if __name__ == "__main__":
     project_id = os.environ.get(
         "GOOGLE_CLOUD_PROJECT", "academic-torch-476716-h3"
     )  # Replace with your actual project ID
-    download_folder("tikkamasalai-models", "", "./models", project=project_id)
+
+    try:
+        ensure_credentials()
+        download_folder("tikkamasalai-models", "", "./models", project=project_id)
+        print("Model successfully downloaded from GCP!")
+    except (RuntimeError, DefaultCredentialsError) as exc:
+        print(f"Authentication failed: {exc}", file=sys.stderr)
+        sys.exit(1)
