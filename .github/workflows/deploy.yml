@@ -107,4 +107,7 @@ jobs:
           exit 1
 
       - name: Run Bruno tests against deployed API
-        run: make test-deployed-api
+        shell: bash
+        run: |
+          cd tikkamasalai-requests
+          bru run --env-file environments/production.bru
