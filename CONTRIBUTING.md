@@ -134,7 +134,9 @@ pre-commit run --all-files
 
 Run tests:
 ```bash
-uv run pytest -q
+make test            # preferred (uses uv in Makefile)
+# or
+uv run pytest -q     # direct invocation
 ```
 
 ## Documentation Expectations

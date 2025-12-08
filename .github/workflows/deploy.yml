@@ -74,3 +74,37 @@ jobs:
           script: |
             cd /home/adrian_mwh100
             ./run.sh
+
+  verify-deployed-api:
+    name: Verify deployed API (Bruno)
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bruno CLI
+        run: npm install -g @usebruno/cli
+
+      - name: Wait for API readiness
+        shell: bash
+        env:
+          API_BASE_URL: https://api.tikkamasalai.tech
+        run: |
+          echo "Waiting for $API_BASE_URL/health..."
+          for i in {1..60}; do
+            if curl -sSf "$API_BASE_URL/health" > /dev/null; then
+              echo "API is healthy"
+              exit 0
+            fi
+            echo "Not ready yet, retry $i/60"
+            sleep 5
+          done
+          echo "API did not become healthy in time" >&2
+          exit 1
+
+      - name: Run Bruno tests against deployed API
+        run: make test-deployed-api

@@ -1,12 +1,14 @@
 Generating the docs
 ----------
 
-Use [mkdocs](http://www.mkdocs.org/) structure to update the documentation. 
+Docs are built with [MkDocs](http://www.mkdocs.org/) using the config at `docs/mkdocs.yml`.
 
-Build locally with:
+Preferred (Makefile targets):
 
-    mkdocs build
+    make docs-build   # builds site to docs/site
+    make docs-serve   # serves at http://127.0.0.1:8001 with live reload
 
-Serve locally with:
+Direct MkDocs (alternative):
 
-    mkdocs serve
+    uv run mkdocs build --strict -f docs/mkdocs.yml
+    uv run mkdocs serve -f docs/mkdocs.yml -a 127.0.0.1:8001

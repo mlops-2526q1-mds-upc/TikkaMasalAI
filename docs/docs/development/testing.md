@@ -21,6 +21,7 @@ Notes
 The API request collection lives in tikkamasalai-requests/ with environment files under tikkamasalai-requests/environments/.
 
 Install CLI
+- Install Bruno CLI and ensure `bru` is on your PATH.
 - See [here](https://www.usebruno.com/downloads) for instructions.
 
 Run against local stack

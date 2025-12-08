@@ -16,6 +16,8 @@ ruff check --fix .    # auto-fix
 ruff format           # apply Ruff formatter
 ```
 
+For style rules and broader engineering conventions, see Development → [Code Style Guide](./code_style.md).
+
 ### Pre-commit (Ruff only)
 
 ```bash
