@@ -62,6 +62,7 @@ Typical first run on macOS (zsh):
 # 1) Create and activate env
 make create_environment
 source .venv/bin/activate
+```
 
 ## Architecture at a Glance
 - **Backend** (`src/backend`): FastAPI service exposing `/predict`, `/predict/explain`, `/llm/*`, metrics, and dashboards. Models are downloaded during Docker builds.
