@@ -4,6 +4,10 @@
         <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
+An MLOps project for food classification using computer vision techniques. You can view a comprehensive documentation focusing on development aspects via GitHub pages [here](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
+
+## Demo Video
+[![Project Demo](res/thumbnail.png)](https://youtu.be/U_t5B0_oh4Q)
 
 ## Overview
 - A full-stack MLOps project for Food-101 classification with automated training, evaluation, and deployment tooling. 
@@ -17,6 +21,32 @@
 ## Links
 - You can access our website at [tikkamasalai.tech](https://tikkamasalai.tech).
 - Development docs live at [mlops-2526q1-mds-upc.github.io/TikkaMasalAI](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
+### dvc
+1. Configure the access keys to the dvc remote by running the following two commands. Replace YOUR_ACCESS_KEY and YOUR_SECRET_ACCESS_KEY with the actual keys. You can get them from Hubert.
+```bash
+uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
+uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
+```
+2. Pull data with DVC: Pull the data from the configured remote using the project environment: `uv run dvc pull`.
+
+## Makefile quick reference
+New to the project? The Makefile bundles common tasks so you don’t have to remember long commands.
+
+- Show all available commands and short descriptions (default):
+
+```bash
+make
+# or
+make help
+```
+
+Core environment and hygiene:
+- `make create_environment` – Create a uv virtualenv for Python 3.10 and print activation hints
+- `make requirements` – Install project dependencies via uv (uses pyproject.toml/uv.lock)
+- `make clean` – Remove Python bytecode and __pycache__ folders
+- `make lint` – Check formatting and lint with Ruff (no changes)
+- `make format` – Auto-fix lint issues and format with Ruff
+- `make test` – Run the test suite with pytest
 
 ## Demo Video
 The following video shows our final application in action.
@@ -24,6 +54,20 @@ The following video shows our final application in action.
 <a href="https://youtu.be/U_t5B0_oh4Q" target="_blank">
   <img src="res/thumbnail.png" alt="Project Demo" width="600"/>
 </a>
+Documentation:
+- `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
+- `make docs-serve` – Serve docs locally at http://127.0.0.1:8001 with live reload
+- `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
+
+Containerization and deployment:
+- Docker & Compose usage: see docs/docs/development/containers.md
+- Deployment strategy (images, tags, registry, rollout): see docs/docs/development/deployment.md
+
+Typical first run on macOS (zsh):
+```bash
+# 1) Create and activate env
+make create_environment
+source .venv/bin/activate
 
 ## Architecture at a Glance
 - **Backend** (`src/backend`): FastAPI service exposing `/predict`, `/predict/explain`, `/llm/*`, metrics, and dashboards. Models are downloaded during Docker builds.
