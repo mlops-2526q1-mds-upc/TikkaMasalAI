@@ -4,65 +4,27 @@
         <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-An MLOps project for food classification using computer vision techniques. You can view a comprehensive documentation focusing on development aspects via GitHub pages [here](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
-
-## Demo Video
-[![Project Demo](res/thumbnail.png)](https://youtu.be/U_t5B0_oh4Q)
+A project for food classification using computer vision techniques, focussing on MLOPS best practices.
 
 ## Overview
-- A full-stack MLOps project for Food-101 classification with automated training, evaluation, and deployment tooling. 
-- End-to-end computer vision workflow: dataset cleaning, training, evaluation, explainability, and MLflow tracking
-- Reproducible FastAPI backend + Streamlit frontend, both dockerized and wired through Docker Compose
-- Lightweight LLM assistant via Ollama (`gemma3:270m`) to augment explanations
-- Automated docs (Redoc + MkDocs), Bruno-powered API tests, and GH Actions CI/CD with multi-arch image builds
-- DVC-managed datasets and GCS-hosted model artifacts for consistent dev/prod parity
+- A full-stack project for Food-101 classification with automated training, evaluation, and deployment tooling.
+- End-to-end computer vision workflow: dataset cleaning, training, evaluation, explainability, and MLflow tracking.
+- Reproducible FastAPI backend + Streamlit frontend, both dockerized and wired through Docker Compose.
+- Lightweight LLM assistant via Ollama (`gemma3:270m`) to augment explanations.
+- Automated docs (Redoc + MkDocs), Bruno-powered API tests, and GH Actions CI/CD with multi-arch image builds.
+- DVC-managed datasets and GCS-hosted model artifacts for consistent dev/prod parity.
 - We use a Makefile which contains many useful commands. Run `make help` to get an overview of them.
+
+## Demo Video
+<p align="center">
+    <a href="https://youtu.be/U_t5B0_oh4Q" target="_blank">
+        <img src="res/thumbnail.png" alt="Project Demo" width="500" />
+    </a>
+</p>
 
 ## Links
 - You can access our website at [tikkamasalai.tech](https://tikkamasalai.tech).
 - Development docs live at [mlops-2526q1-mds-upc.github.io/TikkaMasalAI](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
-### dvc
-1. Configure the access keys to the dvc remote by running the following two commands. Replace YOUR_ACCESS_KEY and YOUR_SECRET_ACCESS_KEY with the actual keys. You can get them from Hubert.
-```bash
-uv run dvc remote modify origin --local access_key_id YOUR_ACCESS_KEY
-uv run dvc remote modify origin --local secret_access_key YOUR_SECRET_ACCESS_KEY
-```
-2. Pull data with DVC: Pull the data from the configured remote using the project environment: `uv run dvc pull`.
-
-## Makefile quick reference
-New to the project? The Makefile bundles common tasks so you don’t have to remember long commands.
-
-- Show all available commands and short descriptions (default):
-
-```bash
-make
-# or
-make help
-```
-
-Core environment and hygiene:
-- `make create_environment` – Create a uv virtualenv for Python 3.10 and print activation hints
-- `make requirements` – Install project dependencies via uv (uses pyproject.toml/uv.lock)
-- `make clean` – Remove Python bytecode and __pycache__ folders
-- `make lint` – Check formatting and lint with Ruff (no changes)
-- `make format` – Auto-fix lint issues and format with Ruff
-- `make test` – Run the test suite with pytest
-
-## Documentation:
-- `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
-- `make docs-serve` – Serve docs locally at http://127.0.0.1:8001 with live reload
-- `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
-
-Containerization and deployment:
-- Docker & Compose usage: see docs/docs/development/containers.md
-- Deployment strategy (images, tags, registry, rollout): see docs/docs/development/deployment.md
-
-Typical first run on macOS (zsh):
-```bash
-# 1) Create and activate env
-make create_environment
-source .venv/bin/activate
-```
 
 ## Architecture at a Glance
 - **Backend** (`src/backend`): FastAPI service exposing `/predict`, `/predict/explain`, `/llm/*`, metrics, and dashboards. Models are downloaded during Docker builds.
@@ -89,15 +51,26 @@ Mermaid diagram + deployment details live in [`docs/docs/development/containers.
 └── tikkamasalai-requests/  # Bruno collections + env files
 ```
 
-## Prerequisites
+## Quick Start (registry images)
+1. Make sure to be a member of the `mlops-2526q1-mds-upc` GitHub Organization.
+2. Generate a GitHub Personal Access Token with at least `read:packages` scope. You can do so in the developer settings page of your GitHub account.
+3. Set the token by running `export GHCR_PAT=ghp_...`
+4. Log in once by running `echo $GHCR_PAT | docker login ghcr.io -u <github-username> --password-stdin` (or enter the token interactively).
+5. Make sure you have Docker running.
+6. Run `make compose-up`, then wait for the images to be pulled.
+7. Access the application at http://localhost:8501.
+
+## Contributing
+### Prerequisites
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.10 runtime + dependency manager)
 - Python 3.10 (uv can install it: `uv python install 3.10`)
 - [Docker + Docker Compose](https://docs.docker.com/engine/install/) (for local stack and deployment parity)
 - Node.js ≥ 20 (Redoc CLI for API docs)
 - [Bruno CLI](https://www.usebruno.com/downloads) (`bru`) for API regression tests
-- Optional: DVC remote credentials (contact the team to get them) to pull large datasets
+- DVC remote credentials (contact the team to get them) to pull large datasets
+- Have [gcloud cli](https://docs.cloud.google.com/sdk/docs/install-sdk) installed
 
-## Environment Setup
+### Environment Setup
 ```bash
 # 1) Create venv
 uv venv
@@ -108,8 +81,6 @@ source .venv/bin/activate
 # 3) Install deps
 uv sync
 ```
-
-Once dependencies finish syncing, run `make test` to execute the full pytest suite and confirm your environment is healthy.
 
 ### Data (DVC)
 ```bash
@@ -153,8 +124,11 @@ The backend Dockerfile downloads model artifacts during the build. If authentica
     export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/application_default_credentials.json"
     ```
 
-## Verification
+### Verification
 (Optional) You can now verify that everything is correctly installed by running `make lint && make test` and running the workflows below.
+
+### General Guidelines
+We follow the guidance in [CONTRIBUTING.md](CONTRIBUTING.md): conventional commits, descriptive PR titles, Ruff formatting, complete test coverage, and documentation updates for user-facing changes.
 
 ## Running the Stack
 ### Local development (build images locally)
@@ -166,26 +140,11 @@ make local-down    # stop and clean up
 - Ports: backend `:8000`, frontend `:8501`, Ollama `:11434` (loopback bound).
 - Mounts `src/frontend/.streamlit/secrets.toml` if present; never commit secrets.
 
-### Production-like (registry images)
-Authenticate with GHCR first:
-1. Generate a GitHub Personal Access Token with at least `read:packages` scope. You can do so in the developer settings page of your GitHub account.
-2. Set the token via running `export GHCR_PAT=ghp_...`
-3. Log in once via `echo $GHCR_PAT | docker login ghcr.io -u <github-username> --password-stdin` (or enter the token interactively).
-4. Optional sanity check: `docker pull ghcr.io/mlops-2526q1-mds-upc/tikka-backend:latest`.
-
-```bash
-make compose-up    # uses ghcr.io/mlops-2526q1-mds-upc/tikka-* images
-make compose-logs
-make compose-down
-```
-Health checks enforce the order: Ollama → Backend → Frontend. See [`docker-compose.yml`](docker-compose.yml) for environment variables and volumes.
-
 ### Individual Docker targets
 - Build/run frontend: `make build-frontend-docker`, `make run-frontend-docker`
 - Build/run backend: `make build-backend-docker`, `make run-backend-docker`
-- Publish to GHCR (multi-arch): `make push-frontend-docker`, `make push-backend-docker`
 
-## Backend API
+## Backend (FastAPI)
 - Source: `src/backend`
 - Key routes:
     - `POST /predict`: classify a multipart `image`
@@ -257,9 +216,7 @@ Add models by subclassing [`src/models/food_classification_model.py`](src/models
     - `docs.yml` regenerates OpenAPI + MkDocs (fails if `docs/docs/api.html` is stale).
     - `ruff.yml` runs Ruff on every push.
     - `deploy.yml` builds multi-arch images (Buildx + QEMU), pushes to GHCR, SSHes into the GCP VM, and restarts the Compose stack with health verification + Bruno smoke tests.
+    - `tests.yml` runs our test suite on every push.
 - Production VM details, secrets strategy, and rollout steps: see [`docs/docs/development/deployment.md`](docs/docs/development/deployment.md).
-
-## Contributing
-We follow the guidance in [CONTRIBUTING.md](CONTRIBUTING.md): conventional commits, descriptive PR titles, Ruff formatting, complete test coverage, and documentation updates for user-facing changes.
 
 ---
