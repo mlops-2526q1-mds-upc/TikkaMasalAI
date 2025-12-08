@@ -48,13 +48,6 @@ Core environment and hygiene:
 - `make format` – Auto-fix lint issues and format with Ruff
 - `make test` – Run the test suite with pytest
 
-## Demo Video
-The following video shows our final application in action.
-
-<a href="https://youtu.be/U_t5B0_oh4Q" target="_blank">
-  <img src="res/thumbnail.png" alt="Project Demo" width="600"/>
-</a>
-
 ## Documentation:
 - `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
 - `make docs-serve` – Serve docs locally at http://127.0.0.1:8001 with live reload
