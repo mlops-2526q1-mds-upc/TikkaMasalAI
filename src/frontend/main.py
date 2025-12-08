@@ -7,7 +7,6 @@ additional information about the predicted dish.
 
 import hashlib
 import io
-import mimetypes
 from typing import Any, Dict, Optional
 
 from config import get_api_url, get_explain_url, get_llm_url
@@ -17,13 +16,13 @@ from heatmap import (
     find_heatmap_in_payload,
     overlay_heatmap_on_image,
 )
+from image_utils import prepare_image_for_upload
 from llm import extract_llm_text
 import numpy as np
 from PIL import Image
 from predict import extract_primary_label
 import requests
 import streamlit as st
-from image_utils import prepare_image_for_upload
 
 
 def main() -> None:
