@@ -81,6 +81,9 @@ jobs:
     needs: deploy
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -108,6 +111,6 @@ jobs:
 
       - name: Run Bruno tests against deployed API
         shell: bash
+        working-directory: tikkamasalai-requests
         run: |
-          cd tikkamasalai-requests
           bru run --env-file environments/production.bru
