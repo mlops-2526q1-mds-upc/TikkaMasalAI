@@ -6,6 +6,9 @@
 
 An MLOps project for food classification using computer vision techniques. You can view a comprehensive documentation focusing on development aspects via GitHub pages [here](https://mlops-2526q1-mds-upc.github.io/TikkaMasalAI/).
 
+## Demo Video
+[![Project Demo](res/thumbnail.png)](https://youtu.be/U_t5B0_oh4Q)
+
 ## Setup
 ### uv
 1. This project uses uv for Python dependency management. You can install it [here](https://docs.astral.sh/uv/getting-started/installation/).
