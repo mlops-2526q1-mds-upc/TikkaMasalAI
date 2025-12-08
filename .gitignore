@@ -206,4 +206,8 @@ ssh-key
 *.pth
 
 # shap
-.npz
+*.npz
+
+# emisssions data
+reports/emissions.csv
+reports/emissions.csv.bak

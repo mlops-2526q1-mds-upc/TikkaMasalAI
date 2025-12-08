@@ -73,6 +73,11 @@ def train_with_emissions_tracking(
         params: Training parameters
         emissions_output_dir: Directory to save emissions data
     """
+    if not params.output.track_emissions:
+        trainer.train()
+        print("Training complete!")
+        return
+
     print("Starting training...")
     tracker = EmissionsTracker(output_dir=emissions_output_dir)
     tracker.start()

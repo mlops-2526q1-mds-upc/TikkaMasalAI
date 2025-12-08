@@ -1,6 +1,6 @@
 # Contributing to TikkaMasalAI
 
-Thanks for your interest in contributing! This document explains how to propose changes, the pull request (PR) workflow, coding standards, and tooling (Ruff, tests, pre-commit).
+Thanks for your interest in contributing! This document explains how to propose changes, the pull request (PR) workflow, coding standards, and tooling (Ruff, tests).
 
 ## Table of Contents
 - [Getting Started](#getting-started)
@@ -8,7 +8,6 @@ Thanks for your interest in contributing! This document explains how to propose 
 - [Commit Messages](#commit-messages)
 - [Pull Request Checklist](#pull-request-checklist)
 - [Code Style & Linting (Ruff)](#code-style--linting-ruff)
-- [Formatting & Pre-commit Hooks](#formatting--pre-commit-hooks)
 - [Testing Guidelines](#testing-guidelines)
 - [Documentation Expectations](#documentation-expectations)
 - [CI Pipeline](#ci-pipeline)
@@ -28,10 +27,6 @@ source .venv/bin/activate
 
 # install dependencies
 uv sync
-
-# install pre-commit hooks
-pre-commit install
-pre-commit run --all-files  # initial cleanup
 ```
 > If you use another virtual env tool (e.g. conda, pyenv), ensure Python matches `>=3.10,<3.13`.
 
@@ -52,15 +47,13 @@ fix/resnet18-loading-bug
 chore/ruff-ci-all-branches
 ```
 
-Required: prepend the corresponding emoji at the start of PR titles to make intent obvious in the review list. Example PR title formats (mandatory):
+Pull request titles should start with the same short prefix to communicate intent quickly. Example title formats:
 
 ```
-✨ feat: add food101 evaluator sampling
-🐛 fix: correct resnet18 loading bug
-📝 docs: update contributing guide with emojis
+feat: add food101 evaluator sampling
+fix: correct resnet18 loading bug
+docs: update contributing guide with new testing section
 ```
-
-These emojis are mandatory for PR titles. The PR checklist and reviewers may ask you to update titles that don't follow this convention; CI or bots may also enforce this in the future.
 
 ## Commit Messages
 Follow conventional-ish style:
@@ -76,7 +69,6 @@ Keep summary <= 72 chars. Body (if present) explains what/why, not how.
 Before opening / marking ready for review:
 - [ ] Branch up to date with latest `main`
 - [ ] `make format` run (or `ruff check --fix && ruff format`)
-- [ ] `pre-commit run --all-files` clean / staged any modifications
 - [ ] `ruff check` passes with no errors
 - [ ] Tests added/updated (if behavior change)
 - [ ] `uv run pytest -q` passes locally
@@ -112,19 +104,6 @@ CI runs `ruff check .` on every push + PR.
 
 Full code style (naming, docstrings, typing, imports, tests, performance, security) lives in `docs/development/code_style.md`. Treat that document as the single source of truth. Propose any style changes by updating that file in the same PR.
 
-## Formatting & Pre-commit Hooks
-We use a single Ruff pre-commit hook (auto-fix). Install once:
-```bash
-pip install pre-commit
-pre-commit install
-```
-On commit, Ruff may modify files; re-stage and re-commit if needed.
-Manual full pass (recommended before PR):
-```bash
-make format          # ruff check --fix + ruff format
-pre-commit run --all-files
-```
-
 ## Testing Guidelines
 - Put tests under `tests/`.
 - Prefer deterministic tests; control randomness (`seed=42` etc.).
@@ -138,6 +117,13 @@ make test            # preferred (uses uv in Makefile)
 # or
 uv run pytest -q     # direct invocation
 ```
+
+API smoke tests (Bruno):
+```bash
+make test-local-api      # hits local docker-compose stack
+make test-deployed-api   # hits the remote environment defined in tikkamasalai-requests/environments/production.bru
+```
+> Configure the Bruno environment files with the correct base URLs + secrets before running the deployed variant.
 
 ## Documentation Expectations
 Update or add:
