@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - fix/bruno-against-deployed
 
 env:
   REGISTRY: ghcr.io
@@ -93,17 +92,6 @@ jobs:
       - name: Install Bruno CLI
         run: npm install -g @usebruno/cli
 
-      - name: Debug workspace layout
-        shell: bash
-        run: |
-          echo "PWD=$(pwd)"
-          echo "Repo root contents:"; ls -la
-          echo "Listing tikkamasalai-requests:"; ls -la tikkamasalai-requests || true
-          echo "Listing tikkamasalai-requests/environments:"; ls -la tikkamasalai-requests/environments || true
-          echo "Node version:"; node -v
-          echo "npm version:"; npm -v
-          echo "Bru version:"; bru --version || true
-
       - name: Wait for API readiness
         shell: bash
         env:
@@ -125,7 +113,4 @@ jobs:
         shell: bash
         working-directory: tikkamasalai-requests
         run: |
-          echo "PWD=$(pwd)"; ls -la
-          bru --version
-          bru env ls || true
           bru run --env-file environments/production.bru
