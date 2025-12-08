@@ -54,7 +54,8 @@ The following video shows our final application in action.
 <a href="https://youtu.be/U_t5B0_oh4Q" target="_blank">
   <img src="res/thumbnail.png" alt="Project Demo" width="600"/>
 </a>
-Documentation:
+
+## Documentation:
 - `make docs-build` – Build the docs site with MkDocs (outputs to `docs/site`)
 - `make docs-serve` – Serve docs locally at http://127.0.0.1:8001 with live reload
 - `make docs` – Build docs, start the server, and open your browser automatically; stop with CTRL+C
@@ -68,6 +69,7 @@ Typical first run on macOS (zsh):
 # 1) Create and activate env
 make create_environment
 source .venv/bin/activate
+```
 
 ## Architecture at a Glance
 - **Backend** (`src/backend`): FastAPI service exposing `/predict`, `/predict/explain`, `/llm/*`, metrics, and dashboards. Models are downloaded during Docker builds.
