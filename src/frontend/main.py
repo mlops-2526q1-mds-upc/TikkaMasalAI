@@ -7,7 +7,6 @@ additional information about the predicted dish.
 
 import hashlib
 import io
-import mimetypes
 from typing import Any, Dict, Optional
 
 from config import get_api_url, get_explain_url, get_llm_url
@@ -17,6 +16,7 @@ from heatmap import (
     find_heatmap_in_payload,
     overlay_heatmap_on_image,
 )
+from image_utils import prepare_image_for_upload
 from llm import extract_llm_text
 import numpy as np
 from PIL import Image
@@ -57,13 +57,19 @@ def main() -> None:
     # Load image + compute a content hash to cache prediction across reruns
     image_bytes = uploaded_file.getvalue()
     image = Image.open(io.BytesIO(image_bytes))
-    mime_type = (
-        uploaded_file.type
-        or mimetypes.guess_type(uploaded_file.name)[0]
-        or "application/octet-stream"
-    )
     # Sidebar preview of the uploaded image
     st.sidebar.image(image, caption="Preview", use_container_width=True)
+
+    upload_bytes, upload_mime, upload_name, upload_dims, _ = prepare_image_for_upload(
+        image, uploaded_file.name
+    )
+    # Sidebar hint about what will be uploaded
+    try:
+        st.sidebar.caption(
+            f"Uploading scaled image: {upload_dims[0]}×{upload_dims[1]} • {len(upload_bytes)/1024:.0f} KB"
+        )
+    except Exception:
+        pass
     img_hash = hashlib.md5(image_bytes).hexdigest()
 
     # Cache prediction for same image across reruns
@@ -76,7 +82,7 @@ def main() -> None:
             try:
                 response = requests.post(
                     api_url,
-                    files={"image": (uploaded_file.name, image_bytes, mime_type)},
+                    files={"image": (upload_name, upload_bytes, upload_mime)},
                     timeout=30,
                 )
                 response.raise_for_status()
@@ -240,7 +246,7 @@ def main() -> None:
                     form_data = {"label": (None, primary_label)} if primary_label else None
                     response = requests.post(
                         explain_url,
-                        files={"image": (uploaded_file.name, image_bytes, mime_type)},
+                        files={"image": (upload_name, upload_bytes, upload_mime)},
                         data=form_data,
                         timeout=60,
                     )
