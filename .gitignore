@@ -166,10 +166,6 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# Generated docs artifacts
-docs/docs/api.html
-site/
-
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -209,8 +205,4 @@ ssh-key
 *.png
 
 # shap
-*.npz
-
-# emisssions data
-reports/emissions.csv
-reports/emissions.csv.bak
+.npz
