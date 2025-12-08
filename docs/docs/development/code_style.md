@@ -1,6 +1,6 @@
 # Code Style Guide
 
-This is the single source of truth for code style and engineering conventions in Tikka MasalAI. Other docs (e.g. `CONTRIBUTING.md`, `AGENTS.md`) should point here instead of duplicating rules.
+This is the single source of truth for code style and engineering conventions in TikkaMasalAI. Other docs (e.g. `CONTRIBUTING.md`, `AGENTS.md`) should point here instead of duplicating rules.
 
 ## 1. Philosophy
 Consistency, clarity, and maintainability first; performance second (unless a hotspot). Prefer explicitness over cleverness. Lean on tooling (Ruff) to automate style so humans focus on logic.
@@ -10,8 +10,6 @@ Consistency, clarity, and maintainability first; performance second (unless a ho
 - **Type checking:** (Planned) — use type hints now; future stricter enforcement may add mypy/pyright.
 - **Tests:** pytest.
 - **Packaging & deps:** `uv` (`pyproject.toml` + `uv.lock`).
-
-CI linting setup and commands are described in Development → [Ruff in CI](./ruff_ci.md).
 
 Authoritative configuration lives in `pyproject.toml` — do not restate values here (e.g., line length = 99) except for explanation.
 

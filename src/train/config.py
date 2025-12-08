@@ -52,7 +52,6 @@ class OutputConfig:
     save_total_limit: int = 2
     logging_steps: int = 50
     report_to: str = "none"
-    track_emissions: bool = True
 
 
 @dataclass
@@ -183,7 +182,6 @@ def _dict_to_params(config_dict: Dict[str, Any]) -> TrainingParams:
             save_total_limit=output_config.get("save_total_limit", params.output.save_total_limit),
             logging_steps=output_config.get("logging_steps", params.output.logging_steps),
             report_to=output_config.get("report_to", params.output.report_to),
-            track_emissions=output_config.get("track_emissions", params.output.track_emissions),
         )
 
     return params
@@ -222,7 +220,6 @@ def save_config(params: TrainingParams, config_path: str) -> None:
             "save_total_limit": params.output.save_total_limit,
             "logging_steps": params.output.logging_steps,
             "report_to": params.output.report_to,
-            "track_emissions": params.output.track_emissions,
         },
     }
 

@@ -1,14 +1,14 @@
 stages:
   download:
-    cmd: uv run python -m src.data.download_data ./data/raw/food101
+    cmd: uv run python -m src.data.download_data ./data/raw/food101_pipeline
     deps:
     - src/data/download_data.py
     outs:
-    - data/raw/food101
+    - data/raw/food101_pipeline
   train:
     cmd: uv run python -m src.train.finetune_resnet18 --epochs 1 --train_samples
       2000 --eval_samples 200 --output_dir models/resnet18-food101-1e-2k 
-      --data_dir data/raw/food101/data --no-track-emissions
+      --data_dir data/raw/food101_pipeline/data
     deps:
     - src/train/finetune_resnet18.py
     outs:

@@ -31,6 +31,7 @@ services:
     # Mount local code for hot-reload
     volumes:
       - ./src:/app/src
+      - ./models:/app/models
     ports:
       - "0.0.0.0:8000:8000"
     depends_on:

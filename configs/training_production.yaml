@@ -26,4 +26,3 @@ output:
   save_total_limit: 3
   logging_steps: 100
   report_to: "none"
-  track_emissions: false
